@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:checklist.db"
+}
+
+model Item {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  order       Int         @unique
+  createdAt   DateTime    @default(now())
+  lists       ListItem[]
+}
+
+model List {
+  id          Int         @id @default(autoincrement())
+  name        String?
+  date        String?
+  createdAt   DateTime    @default(now())
+  items       ListItem[]
+}
+
+model ListItem {
+  id          Int         @id @default(autoincrement())
+  createdAt   DateTime    @default(now())
+  list        List        @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId      Int
+  item        Item        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId      Int
+
+  @@unique([listId, itemId])
+}
