@@ -49,3 +49,11 @@ export async function removeListItem({ listId, itemId }) {
     method: 'DELETE',
   })
 }
+
+export async function reorderItem({ from, to }) {
+  const response = await fetch(`/api/item`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from, to }),
+  })
+}
