@@ -3,13 +3,10 @@ import { DragDropContext, Droppable, DroppableProps } from '@hello-pangea/dnd'
 import { Checkbox, TextField, Button } from '@mui/material'
 import Item from './Item'
 import { Item as ItemType } from '../types/models'
-import { addItem, reorderItem } from '../util/api'
+import { addItem, fetchAllItems, reorderItem } from '../util/api'
 
 type ItemListProps = {
-  listid: number
-  items: ItemType[]
-  selectedIds: number[]
-  refreshList: () => any
+  listId: number
 }
 
 // taken from:
@@ -33,9 +30,20 @@ const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
   return <Droppable {...props}>{children}</Droppable>
 }
 
-export default function ItemList({ listId, items, refreshList }: ItemListProps) {
+export default function ItemList({ listId }: ItemListProps) {
   const [newItem, setNewItem] = useState<string>("")
-  const [orderedItems, setOrderedItems] = useState<ItemType[]>(items)
+  const [items, setItems] = useState<ItemType[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    refreshItems()
+  }, [])
+
+  async function refreshItems() {
+    const data = await fetchAllItems(listId)
+    setItems(data)
+    setIsLoading(false)
+  }
 
   async function handleDragEnd(result) {
     const { destination, source } = result
@@ -48,11 +56,11 @@ export default function ItemList({ listId, items, refreshList }: ItemListProps) 
       return
     }
 
-    let newOrderedItems = [...orderedItems]
-    newOrderedItems.splice(source.index, 1)
-    newOrderedItems.splice(destination.index, 0, orderedItems[source.index])
+    let newItems = [...items]
+    newItems.splice(source.index, 1)
+    newItems.splice(destination.index, 0, items[source.index])
 
-    setOrderedItems(newOrderedItems)
+    setItems(newItems)
     await reorderItem({ from: source.index + 1, to: destination.index + 1 })
   }
 
@@ -61,36 +69,41 @@ export default function ItemList({ listId, items, refreshList }: ItemListProps) 
 
     if (newItem.length > 0) {
       await addItem({ listId, name: newItem })
-      await refreshList()
+      await refreshItems()
       setNewItem("")
     }
   }
 
   return (
     <>
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <StrictModeDroppable droppableId={`droppable-${listId}`}>
-          { provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              { orderedItems.map((item, index) => (
-                <Item key={item.id} listId={listId} item={item} selected={item.lists.length > 0} index={index} />
-              )) }
-              { provided.placeholder }
-            </div>
-          ) }
-        </StrictModeDroppable>
-      </DragDropContext>
+      { isLoading && <div>Loading...</div> }
+      { !isLoading &&
+        <>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <StrictModeDroppable droppableId={`droppable-${listId}`}>
+              { provided => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  { items.map((item, index) => (
+                    <Item key={item.id} listId={listId} item={item} selected={item.lists.length > 0} index={index} />
+                  )) }
+                  { provided.placeholder }
+                </div>
+              ) }
+            </StrictModeDroppable>
+          </DragDropContext>
 
-      <form onSubmit={handleAddItem} cx={{ display: 'inline-block' }}>
-        <Checkbox checked={true} disabled={true} />&nbsp;
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="New item"
-          onChange={event => setNewItem(event.target.value)}
-          value={newItem}
-          />
-      </form>
+          <form onSubmit={handleAddItem} cx={{ display: 'inline-block' }}>
+            <Checkbox checked={true} disabled={true} />&nbsp;
+            <TextField
+              variant="outlined"
+              size="small"
+              placeholder="New item"
+              onChange={event => setNewItem(event.target.value)}
+              value={newItem}
+              />
+          </form>
+        </>
+      }
     </>
   )
 }

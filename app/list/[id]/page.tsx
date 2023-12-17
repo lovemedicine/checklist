@@ -14,7 +14,6 @@ type ListPageProps = {
 
 export default function ListPage({ params: { id } }: ListPageProps) {
   let [list, setList] = useState<List | null>(null)
-  let [items, setItems] = useState<Item[]>([])
   let [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -24,12 +23,6 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   async function refreshList() {
     const list = await fetchList(id)
     setList(list)
-    await refreshItems(id)
-  }
-
-  async function refreshItems(id) {
-    const items = await fetchAllItems(id)
-    setItems(items)
     setIsLoading(false)
   }
 
@@ -42,7 +35,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
             <Typography variant="h5">List: {list.name} {list.date}</Typography>
           </Box>
 
-          <ItemList listId={list.id} items={items} refreshList={refreshList} />
+          <ItemList listId={list.id} />
         </>
       }
     </>
