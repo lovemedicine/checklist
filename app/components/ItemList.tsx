@@ -84,7 +84,7 @@ export default function ItemList({ listId }: ItemListProps) {
               { provided => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
                   { items.map((item, index) => (
-                    <Item key={item.id} listId={listId} item={item} selected={item.lists.length > 0} index={index} />
+                    <Item key={item.id} listId={listId} item={item} selected={item.lists.length > 0} index={index} onDelete={refreshItems} />
                   )) }
                   { provided.placeholder }
                 </div>

@@ -37,9 +37,26 @@ export async function PUT(request: Request) {
     })
 
     if (ups) {
+      // sqlite will throw unique constraint error if values are incremented directly.
+      // instead we have to raise them above the current max order then lower them to
+      // the value we intended to increment to.
+      // see: https://stackoverflow.com/questions/7703196/sqlite-increment-unique-integer-field
+
+      const { _max: { order: maxOrder } } = await prisma.item.aggregate({
+        _max: { order: true },
+      })
+      const diff = maxOrder - Math.min(...ups)
+
       await tx.item.updateMany({
         where: { order: { in: ups } },
-        data: { order: { increment: 1 } },
+        data: { order: { increment: diff + 1 } },
+      })
+
+      const newUps = ups.map(order => order + diff + 1)
+
+      await tx.item.updateMany({
+        where: { order: { in: newUps } },
+        data: { order: { decrement: diff } },
       })
     }
 

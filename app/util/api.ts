@@ -57,3 +57,9 @@ export async function reorderItem({ from, to }) {
     body: JSON.stringify({ from, to }),
   })
 }
+
+export async function deleteItem(id: number) {
+  const response = await fetch(`/api/item/${id}`, {
+    method: 'DELETE'
+  })
+}

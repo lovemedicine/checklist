@@ -14,7 +14,7 @@ export async function DELETE(request: Request, { params }: { params: { id: numbe
       id: parseInt(params.id),
     },
     include: {
-      listItems: true
+      lists: true
     },
   })
   return NextResponse.json(result)
