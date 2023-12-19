@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import prisma from '../../../prisma'
 
-export async function DELETE(request: Request, { params }: { params: { id: number } }) {
-  const { order } = await prisma.item.findUnique({
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const result = await prisma.item.findUnique({
     where: {
       id: parseInt(params.id)
     },
@@ -10,6 +10,10 @@ export async function DELETE(request: Request, { params }: { params: { id: numbe
       order: true
     },
   })
+
+  if (!result) {
+    return NextResponse.json({ error: 'Item Not Found' }, { status: 404 })
+  }
 
   await prisma.$transaction(async (tx) => {
     await prisma.item.delete({
@@ -19,7 +23,7 @@ export async function DELETE(request: Request, { params }: { params: { id: numbe
     })
 
     await tx.item.updateMany({
-      where: { order: { gt: order } },
+      where: { order: { gt: result.order } },
       data: { order: { decrement: 1 } },
     })
   })

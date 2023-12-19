@@ -33,7 +33,7 @@ async function main() {
 
   const list1 = await prisma.list.create({
     data: {
-      name: 'whole foods',
+      name: 'food',
       date: '2023-12-02',
       items: {
         create: [

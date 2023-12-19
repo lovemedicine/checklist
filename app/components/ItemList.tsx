@@ -40,7 +40,7 @@ export default function ItemList({ listId }: ItemListProps) {
     setOrderedItems(items || [])
   }, [items])
 
-  async function handleDragEnd(result) {
+  async function handleDragEnd(result: any) {
     const { destination, source } = result
 
     if (!destination) {
@@ -51,15 +51,15 @@ export default function ItemList({ listId }: ItemListProps) {
       return
     }
 
-    let newItems = [...items]
+    let newItems = [...(items as ItemType[])]
     newItems.splice(source.index, 1)
-    newItems.splice(destination.index, 0, items[source.index])
+    newItems.splice(destination.index, 0, (items as ItemType[])[source.index])
     setOrderedItems(newItems)
 
     await reorderItem({ from: source.index + 1, to: destination.index + 1 })
   }
 
-  async function handleAddItem(event) {
+  async function handleAddItem(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (newItem.length > 0) {

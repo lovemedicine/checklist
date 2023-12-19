@@ -16,7 +16,7 @@ type ItemProps = {
 export default function Item({ item, listId, selected, index, onDelete }: ItemProps) {
   const [checked, setChecked] = useState<boolean>(selected)
 
-  async function handleChange(event) {
+  async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const data = { listId, itemId: item.id }
     const { checked } = event.target
 
@@ -29,7 +29,7 @@ export default function Item({ item, listId, selected, index, onDelete }: ItemPr
     setChecked(checked)
   }
 
-  async function handleDelete(event) {
+  async function handleDelete() {
     await deleteItem(item.id)
     onDelete()
   }
@@ -44,7 +44,7 @@ export default function Item({ item, listId, selected, index, onDelete }: ItemPr
               &nbsp;{item.name}
             </div>
             <div>
-              <DeleteForever className="item-delete-button" sx={{ color: 'grey', position: 'relative', top: 5 }} onClick={() => handleDelete(item.id)} />
+              <DeleteForever className="item-delete-button" sx={{ color: 'grey', position: 'relative', top: 5 }} onClick={handleDelete} />
             </div>
           </div>
         </div>

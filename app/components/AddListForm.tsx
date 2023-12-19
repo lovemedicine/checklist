@@ -11,7 +11,7 @@ export default function AddListForm({ refreshLists }: AddListFormProps) {
   let [date, setDate] = useState<string>("")
   let [isValid, setIsValid] = useState<boolean>(true)
 
-  async function handleAddList(event) {
+  async function handleAddList(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (date.length === 0 || date.match(/\d{4}-\d{2}-\d{2}/i)) {

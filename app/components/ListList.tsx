@@ -10,7 +10,7 @@ export default function ListList({ lists, refreshLists }: ListListProps) {
   return (
     <>
       { lists.map(list => (
-        <List list={list} refreshLists={refreshLists} />
+        <List key={list.id} list={list} refreshLists={refreshLists} />
       )) }
     </>
   )

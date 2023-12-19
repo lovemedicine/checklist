@@ -1,4 +1,6 @@
-export const fetcher = (...args) => fetch(...args).then(res => res.json())
+export function fetcher(input: RequestInfo | URL, init?: RequestInit | undefined) {
+  return fetch(input, init).then(res => res.json())
+}
 
 export async function addList(list: { name: string, date: string }) {
   const response = await fetch('/api/list', {

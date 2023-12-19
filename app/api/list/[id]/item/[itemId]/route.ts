@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server'
 import prisma from '../../../../../prisma'
 
 type Params = {
-  id: number
-  itemId: number
+  id: string
+  itemId: string
 }
 
-export async function PUT(request: Request, { params }: Params) {
+export async function PUT(request: Request, { params }: { params: Params }) {
   const result = await prisma.listItem.create({
     data: {
       listId: parseInt(params.id),
@@ -16,7 +16,7 @@ export async function PUT(request: Request, { params }: Params) {
   return NextResponse.json(result)
 }
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params }: { params: Params }) {
   const result = await prisma.listItem.delete({
     where: {
       listId_itemId: {

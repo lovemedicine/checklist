@@ -10,8 +10,8 @@ export type List = {
   id: number
   name: string
   date: string
-  createdAt?: string
-  items?: ListItem[]
+  createdAt: string
+  items: ListItem[]
 }
 
 export type ListItem = {

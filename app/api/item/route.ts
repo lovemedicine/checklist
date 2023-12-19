@@ -12,8 +12,8 @@ export async function POST(request: Request) {
   return NextResponse.json(result)
 }
 
-function getUpsAndDowns(from: number, to: number): { ups: number[], downs: number[] } {
-  const range = (start, stop) => Array.from({ length: stop - start + 1 }, (_, i) => start + i)
+function getUpsAndDowns(from: number, to: number): { ups?: number[] | undefined, downs?: number[] } {
+  const range = (start: number, stop: number) => Array.from({ length: stop - start + 1 }, (_, i) => start + i)
   let ups
   let downs
 
@@ -45,7 +45,8 @@ export async function PUT(request: Request) {
       const { _max: { order: maxOrder } } = await prisma.item.aggregate({
         _max: { order: true },
       })
-      const diff = maxOrder - Math.min(...ups)
+
+      const diff = (maxOrder as number) - Math.min(...ups)
 
       await tx.item.updateMany({
         where: { order: { in: ups } },
