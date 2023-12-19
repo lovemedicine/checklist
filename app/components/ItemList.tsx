@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import useSWR from 'swr'
+import React, { useState, useEffect } from 'react'
 import { DragDropContext, Droppable, DroppableProps } from '@hello-pangea/dnd'
 import { Checkbox, TextField } from '@mui/material'
 import Item from './Item'
@@ -7,7 +6,11 @@ import { Item as ItemType } from '../types/models'
 import { addItem, reorderItem, fetcher } from '../util/api'
 
 type ItemListProps = {
-  listId: number
+  listId: number,
+  items: ItemType[] | undefined,
+  refreshItems: () => any,
+  error: any,
+  isLoading: boolean
 }
 
 // taken from:
@@ -31,9 +34,8 @@ const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
   return <Droppable {...props}>{children}</Droppable>
 }
 
-export default function ItemList({ listId }: ItemListProps) {
+export default function ItemList({ listId, items, refreshItems, error, isLoading }: ItemListProps) {
   const [newItem, setNewItem] = useState<string>("")
-  const { data: items, error, isLoading, mutate: refreshItems } = useSWR<ItemType[]>(`/api/list/${listId}/item`, fetcher)
   const [orderedItems, setOrderedItems] = useState<ItemType[]>(items || [])
 
   useEffect(() => {
@@ -75,35 +77,30 @@ export default function ItemList({ listId }: ItemListProps) {
 
   return (
     <>
-      { isLoading && <div>Loading...</div> }
-      { !isLoading &&
-        <>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <StrictModeDroppable droppableId={`droppable-${listId}`}>
-              { provided => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
-                  { orderedItems.map((item, index) => (
-                    <Item key={item.id} listId={listId} item={item} selected={item.lists.length > 0} index={index} onDelete={refreshItems} />
-                  )) }
-                  { provided.placeholder }
-                </div>
-              ) }
-            </StrictModeDroppable>
-          </DragDropContext>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <StrictModeDroppable droppableId={`droppable-${listId}`}>
+          { provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              { orderedItems.map((item, index) => (
+                <Item key={item.id} listId={listId} item={item} selected={item.lists.length > 0} index={index} onDelete={refreshItems} />
+              )) }
+              { provided.placeholder }
+            </div>
+          ) }
+        </StrictModeDroppable>
+      </DragDropContext>
 
-          <form onSubmit={handleAddItem} style={{ display: 'inline-block' }}>
-            <Checkbox checked={true} disabled={true} />&nbsp;
-            <TextField
-              variant="outlined"
-              size="small"
-              placeholder="New item"
-              onChange={event => setNewItem(event.target.value)}
-              value={newItem}
-              sx={{ width: '180px' }}
-              />
-          </form>
-        </>
-      }
+      <form onSubmit={handleAddItem} style={{ display: 'inline-block' }}>
+        <Checkbox checked={true} disabled={true} />&nbsp;
+        <TextField
+          variant="outlined"
+          size="small"
+          placeholder="New item"
+          onChange={event => setNewItem(event.target.value)}
+          value={newItem}
+          sx={{ width: '180px' }}
+          />
+      </form>
     </>
   )
 }

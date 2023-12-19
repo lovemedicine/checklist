@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
-import { Card, CardContent, Checkbox } from '@mui/material'
+import { Checkbox } from '@mui/material'
 import { DeleteForever } from '@mui/icons-material'
 import { Item as ItemType } from '../types/models'
 import { addListItem, removeListItem, deleteItem } from '../util/api'
