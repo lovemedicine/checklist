@@ -60,7 +60,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
         </Grid>
       </Grid>
 
-      <div style={{ columnWidth: '200px', columnGap: '20px', columnFill: 'auto', height: 'calc(100vh - 130px)' }}>
+      <div style={{ columnWidth: '210px', columnGap: '20px', columnFill: 'auto', height: 'calc(100vh - 130px)' }}>
         <ItemList
           listId={list.id}
           items={items}

@@ -91,14 +91,15 @@ export default function ItemList({ listId, items, refreshItems, error, isLoading
       </DragDropContext>
 
       <form onSubmit={handleAddItem} style={{ display: 'inline-block' }}>
-        <Checkbox checked={true} disabled={true} />&nbsp;
+        <Checkbox checked={true} disabled={true} sx={{ padding: '5px' }} />&nbsp;
         <TextField
           variant="outlined"
           size="small"
           placeholder="New item"
           onChange={event => setNewItem(event.target.value)}
           value={newItem}
-          sx={{ width: '180px' }}
+          autoComplete='off'
+          sx={{ width: '170px' }}
           />
       </form>
     </>
