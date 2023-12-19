@@ -99,6 +99,7 @@ export default function ItemList({ listId }: ItemListProps) {
               placeholder="New item"
               onChange={event => setNewItem(event.target.value)}
               value={newItem}
+              sx={{ width: '180px' }}
               />
           </form>
         </>

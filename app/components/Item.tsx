@@ -38,7 +38,7 @@ export default function Item({ item, listId, selected, index, onDelete }: ItemPr
     <Draggable draggableId={`draggable-${item.id}`} index={index}>
       { provided => (
         <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-          <div className="item" style={{ display: "flex", justifyContent: "space-between", width: '100%' }}>
+          <div className="item" style={{ display: "flex", justifyContent: "space-between" }}>
             <div>
               <Checkbox checked={checked} onChange={handleChange} />
               &nbsp;{item.name}

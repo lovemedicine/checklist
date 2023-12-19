@@ -16,11 +16,12 @@ function Header() {
     backgroundColor: "#eee",
     display: "flex",
     justifyContent: "space-between",
-    padding: 10
+    padding: 10,
+    height: 42
   }
-  
+
   return (
-    <header id="heaer" style={style}>
+    <header id="header" style={style}>
       <Typography variant="h4" sx={{ '& a': { color: 'black' }}}>
         <Link id="logo" href="/">Checklist App</Link>
       </Typography>

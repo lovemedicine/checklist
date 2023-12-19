@@ -25,7 +25,9 @@ export default function ListPage({ params: { id } }: ListPageProps) {
         <Typography variant="h5">List: {list.name} {list.date}</Typography>
       </Box>
 
-      <ItemList listId={list.id} />
+      <div style={{ columnWidth: '200px', columnGap: '20px', columnFill: 'auto', height: 'calc(100vh - 130px)' }}>
+        <ItemList listId={list.id} />
+      </div>
     </>
   )
 }
