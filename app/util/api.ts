@@ -1,11 +1,6 @@
-import { Item, List } from '../types/models'
+export const fetcher = (...args) => fetch(...args).then(res => res.json())
 
-export async function fetchLists() {
-  const response = await fetch('/api/list')
-  return await response.json()
-}
-
-export async function addList(list: List) {
+export async function addList(list: { name: string, date: string }) {
   const response = await fetch('/api/list', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -20,17 +15,7 @@ export async function deleteList(id: number) {
   })
 }
 
-export async function fetchList(id: number) {
-  const response = await fetch(`/api/list/${id}`)
-  return await response.json()
-}
-
-export async function fetchAllItems(listId: number) {
-  const response = await fetch(`/api/list/${listId}/item`)
-  return await response.json()
-}
-
-export async function addItem({ listId, name }) {
+export async function addItem({ listId, name }: { listId: number, name: string }) {
   const response = await fetch(`/api/list/${listId}/item`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -38,19 +23,19 @@ export async function addItem({ listId, name }) {
   })
 }
 
-export async function addListItem({ listId, itemId }) {
+export async function addListItem({ listId, itemId }: { listId: number, itemId: number }) {
   const response = await fetch(`/api/list/${listId}/item/${itemId}`, {
     method: 'PUT'
   })
 }
 
-export async function removeListItem({ listId, itemId }) {
+export async function removeListItem({ listId, itemId }: { listId: number, itemId: number }) {
   const response = await fetch(`/api/list/${listId}/item/${itemId}`, {
     method: 'DELETE',
   })
 }
 
-export async function reorderItem({ from, to }) {
+export async function reorderItem({ from, to }: { from: number, to: number }) {
   const response = await fetch(`/api/item`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

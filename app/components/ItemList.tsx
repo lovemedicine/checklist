@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { DragDropContext, Droppable, DroppableProps } from '@hello-pangea/dnd'
-import { Checkbox, TextField, Button } from '@mui/material'
+import { Checkbox, TextField } from '@mui/material'
 import Item from './Item'
 import { Item as ItemType } from '../types/models'
-import { addItem, fetchAllItems, reorderItem } from '../util/api'
+import { addItem, reorderItem, fetcher } from '../util/api'
 
 type ItemListProps = {
   listId: number
@@ -32,18 +33,12 @@ const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
 
 export default function ItemList({ listId }: ItemListProps) {
   const [newItem, setNewItem] = useState<string>("")
-  const [items, setItems] = useState<ItemType[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const { data: items, error, isLoading, mutate: refreshItems } = useSWR<ItemType[]>(`/api/list/${listId}/item`, fetcher)
+  const [orderedItems, setOrderedItems] = useState<ItemType[]>(items || [])
 
   useEffect(() => {
-    refreshItems()
-  }, [])
-
-  async function refreshItems() {
-    const data = await fetchAllItems(listId)
-    setItems(data)
-    setIsLoading(false)
-  }
+    setOrderedItems(items || [])
+  }, [items])
 
   async function handleDragEnd(result) {
     const { destination, source } = result
@@ -59,8 +54,8 @@ export default function ItemList({ listId }: ItemListProps) {
     let newItems = [...items]
     newItems.splice(source.index, 1)
     newItems.splice(destination.index, 0, items[source.index])
+    setOrderedItems(newItems)
 
-    setItems(newItems)
     await reorderItem({ from: source.index + 1, to: destination.index + 1 })
   }
 
@@ -74,6 +69,10 @@ export default function ItemList({ listId }: ItemListProps) {
     }
   }
 
+  if (error) return <div>Error loading list</div>
+  if (isLoading) return <div>Loading...</div>
+  if (!items) return null
+
   return (
     <>
       { isLoading && <div>Loading...</div> }
@@ -83,7 +82,7 @@ export default function ItemList({ listId }: ItemListProps) {
             <StrictModeDroppable droppableId={`droppable-${listId}`}>
               { provided => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
-                  { items.map((item, index) => (
+                  { orderedItems.map((item, index) => (
                     <Item key={item.id} listId={listId} item={item} selected={item.lists.length > 0} index={index} onDelete={refreshItems} />
                   )) }
                   { provided.placeholder }
@@ -92,7 +91,7 @@ export default function ItemList({ listId }: ItemListProps) {
             </StrictModeDroppable>
           </DragDropContext>
 
-          <form onSubmit={handleAddItem} cx={{ display: 'inline-block' }}>
+          <form onSubmit={handleAddItem} style={{ display: 'inline-block' }}>
             <Checkbox checked={true} disabled={true} />&nbsp;
             <TextField
               variant="outlined"

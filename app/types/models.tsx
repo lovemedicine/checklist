@@ -1,8 +1,9 @@
 export type Item = {
   id: number
   name: string
-  order?: number
-  createdAt?: string
+  order: number
+  createdAt: string
+  lists: ListItem[]
 }
 
 export type List = {
@@ -10,7 +11,7 @@ export type List = {
   name: string
   date: string
   createdAt?: string
-  Items?: ListItem[]
+  items?: ListItem[]
 }
 
 export type ListItem = {

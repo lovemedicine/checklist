@@ -1,27 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { Box, Typography } from '@mui/material'
 import AddListForm from './components/AddListForm'
 import ListList from './components/ListList'
 import { List } from './types/models'
-import { fetchLists } from './util/api'
+import { fetcher } from './util/api'
 
 export default function Home() {
-  let [lists, setLists] = useState<List[]>([])
-  let [isLoading, setIsLoading] = useState(true)
+  const { data: lists, error, isLoading, mutate: refreshLists } = useSWR<List[]>('/api/list', fetcher)
 
-  useEffect(() => {
-    refreshLists()
-    return () => {}
-  }, [])
-
-  async function refreshLists() {
-    setIsLoading(true)
-    const result = await fetchLists()
-    setLists(result)
-    setIsLoading(false)
-  }
+  if (error) return <div>Error loading lists</div>
+  if (isLoading) return <div>Loading...</div>
+  if (!lists) return null
 
   return (
     <>
@@ -31,7 +22,7 @@ export default function Home() {
       </Box>
 
       <Typography variant="h6">All lists</Typography>
-      <ListList lists={lists} isLoading={isLoading} refreshLists={refreshLists} />
+      <ListList lists={lists} refreshLists={refreshLists} />
     </>
   )
 }

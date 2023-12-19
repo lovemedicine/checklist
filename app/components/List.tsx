@@ -7,11 +7,10 @@ import { List } from '../types/models'
 
 type ListProps = {
   list: List
-  createdAt: string
   refreshLists: () => any
 }
 
-export default function List({ list, createdAt, refreshLists }: ListProps) {
+export default function List({ list, refreshLists }: ListProps) {
   const timeFormatter = (value: number, unit: TimeAgo.Unit, suffix: TimeAgo.Suffix) => {
     if (unit === 'second') return 'just now';
     const plural: string = value !== 1 ? 's' : '';

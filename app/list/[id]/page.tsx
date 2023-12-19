@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { Box, Typography } from '@mui/material'
 import ItemList from '../../components/ItemList'
-import { List, Item } from '../../types/models'
-import { fetchList, fetchAllItems } from '../../util/api'
+import { List } from '../../types/models'
+import { fetcher } from '../../util/api'
 
 type ListPageProps = {
   params: {
@@ -13,31 +13,19 @@ type ListPageProps = {
 }
 
 export default function ListPage({ params: { id } }: ListPageProps) {
-  let [list, setList] = useState<List | null>(null)
-  let [isLoading, setIsLoading] = useState(true)
+  const { data: list, error, isLoading, mutate: refreshList } = useSWR<List>(`/api/list/${id}`, fetcher)
 
-  useEffect(() => {
-    refreshList()
-  }, [])
-
-  async function refreshList() {
-    const list = await fetchList(id)
-    setList(list)
-    setIsLoading(false)
-  }
+  if (error) return <div>Error loading list</div>
+  if (isLoading) return <div>Loading...</div>
+  if (!list) return null
 
   return (
     <>
-      { isLoading && <div>Loading...</div> }
-      { !isLoading &&
-        <>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="h5">List: {list.name} {list.date}</Typography>
-          </Box>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h5">List: {list.name} {list.date}</Typography>
+      </Box>
 
-          <ItemList listId={list.id} />
-        </>
-      }
+      <ItemList listId={list.id} />
     </>
   )
 }

@@ -3,7 +3,7 @@ import { Grid, TextField, Button } from '@mui/material'
 import { addList } from '../util/api'
 
 type AddListFormProps = {
-  refreshSkills: () => any
+  refreshLists: () => any
 }
 
 export default function AddListForm({ refreshLists }: AddListFormProps) {
