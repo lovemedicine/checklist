@@ -52,7 +52,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
         </Grid>
         <Grid item sx={{ ml: 2 }}>
           <Button variant="outlined" size="small" startIcon={<ContentCopy />} onClick={handleCopy}>
-            Copy items
+            Copy selected
           </Button>
         </Grid>
         <Grid item sx={{ p: '5px', pl: '10px', color: 'grey' }}>

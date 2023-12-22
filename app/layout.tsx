@@ -23,7 +23,7 @@ function Header() {
   return (
     <header id="header" style={style}>
       <Typography variant="h4" sx={{ '& a': { color: 'black' }}}>
-        <Link id="logo" href="/">Checklist App</Link>
+        <Link id="logo" href="/">Checklists</Link>
       </Typography>
     </header>
   );
