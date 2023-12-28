@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import useSWR from 'swr'
-import { Box, Typography, Button, Grid } from '@mui/material'
-import { ContentCopy } from '@mui/icons-material'
+import { Typography, Button, Grid } from '@mui/material'
+import { ContentCopy, BackHandOutlined, CheckCircleOutlined } from '@mui/icons-material'
 import ItemList from '../../components/ItemList'
 import { List, Item } from '../../types/models'
 import { fetcher } from '../../util/api'
@@ -20,6 +20,14 @@ export default function ListPage({ params: { id } }: ListPageProps) {
     data: items, error: itemsError, isLoading: isLoadingItems, mutate: refreshItems
   } = useSWR<Item[]>(`/api/list/${id}/item`, fetcher)
   const [copied, setCopied] = useState(false)
+  const [isReorderMode, setIsReorderMode] = useState(false)
+
+  const containerStyle: React.CSSProperties = isReorderMode ? {} : {
+    columnWidth: '210px',
+    columnGap: '20px',
+    columnFill: 'auto',
+    height: 'calc(100vh - 130px)'
+  }
 
   useEffect(() => {
     if (copied) {
@@ -44,11 +52,25 @@ export default function ListPage({ params: { id } }: ListPageProps) {
     setCopied(true)
   }
 
+  function handleToggleReorderMode() {
+    setIsReorderMode(!isReorderMode)
+  }
+
   return (
     <>
       <Grid container sx={{ mb: 2 }}>
         <Grid item>
           <Typography variant="h5">List: {list.name} ({list.date})</Typography>
+        </Grid>
+        <Grid item sx={{ ml: 2 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={isReorderMode ? <CheckCircleOutlined /> : <BackHandOutlined />}
+            onClick={handleToggleReorderMode}
+          >
+            { isReorderMode ? "Finish Reorder" : "Reorder Items" }
+          </Button>
         </Grid>
         <Grid item sx={{ ml: 2 }}>
           <Button variant="outlined" size="small" startIcon={<ContentCopy />} onClick={handleCopy}>
@@ -60,13 +82,14 @@ export default function ListPage({ params: { id } }: ListPageProps) {
         </Grid>
       </Grid>
 
-      <div style={{ columnWidth: '210px', columnGap: '20px', columnFill: 'auto', height: 'calc(100vh - 130px)' }}>
+      <div style={containerStyle}>
         <ItemList
           listId={list.id}
           items={items}
           refreshItems={refreshItems}
           error={itemsError}
           isLoading={isLoadingItems}
+          enableDrag={isReorderMode}
           />
       </div>
     </>

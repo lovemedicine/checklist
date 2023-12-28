@@ -11,9 +11,10 @@ type ItemProps = {
   selected: boolean
   index: number
   onDelete: () => any
+  enableDrag: boolean
 }
 
-export default function Item({ item, listId, selected, index, onDelete }: ItemProps) {
+export default function Item({ item, listId, selected, index, onDelete, enableDrag }: ItemProps) {
   const [checked, setChecked] = useState<boolean>(selected)
 
   async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -35,7 +36,7 @@ export default function Item({ item, listId, selected, index, onDelete }: ItemPr
   }
 
   return (
-    <Draggable draggableId={`draggable-${item.id}`} index={index}>
+    <Draggable draggableId={`draggable-${item.id}`} index={index} isDragDisabled={!enableDrag}>
       { provided => (
         <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
           <div className="item" style={{ display: "flex", justifyContent: "space-between" }}>

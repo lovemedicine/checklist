@@ -10,7 +10,8 @@ type ItemListProps = {
   items: ItemType[] | undefined,
   refreshItems: () => any,
   error: any,
-  isLoading: boolean
+  isLoading: boolean,
+  enableDrag: booelan
 }
 
 // taken from:
@@ -34,7 +35,7 @@ const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
   return <Droppable {...props}>{children}</Droppable>
 }
 
-export default function ItemList({ listId, items, refreshItems, error, isLoading }: ItemListProps) {
+export default function ItemList({ listId, items, refreshItems, error, isLoading, enableDrag }: ItemListProps) {
   const [newItem, setNewItem] = useState<string>("")
   const [orderedItems, setOrderedItems] = useState<ItemType[]>(items || [])
 
@@ -82,7 +83,14 @@ export default function ItemList({ listId, items, refreshItems, error, isLoading
           { provided => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
               { orderedItems.map((item, index) => (
-                <Item key={item.id} listId={listId} item={item} selected={item.lists.length > 0} index={index} onDelete={refreshItems} />
+                <Item
+                  key={item.id}
+                  listId={listId}
+                  item={item}
+                  selected={item.lists.length > 0} index={index}
+                  onDelete={refreshItems}
+                  enableDrag={enableDrag}
+                  />
               )) }
               { provided.placeholder }
             </div>
