@@ -11,7 +11,7 @@ type ItemListProps = {
   refreshItems: () => any,
   error: any,
   isLoading: boolean,
-  enableDrag: booelan
+  enableDrag: boolean
 }
 
 // taken from:
