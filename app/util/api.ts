@@ -11,6 +11,15 @@ export async function addList(list: { name: string }) {
   return await response.json()
 }
 
+export async function updateList({ id, name }: { id: number, name: string }) {
+  const response = await fetch(`/api/list/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  })
+  return await response.json()
+}
+
 export async function deleteList(id: number) {
   await fetch(`/api/list/${id}`, {
     method: 'DELETE',
