@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import prisma from '../../prisma'
+import prisma from '@/prisma'
 
 export async function GET(request: Request) {
   const result = await prisma.item.findMany({ orderBy: { order: 'asc' }})

@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import { Checkbox } from '@mui/material'
 import { DeleteForever } from '@mui/icons-material'
-import { Item as ItemType } from '../types/models'
-import { addListItem, removeListItem, deleteItem } from '../util/api'
+import { Item as ItemType } from '@/types/models'
+import { addListItem, removeListItem, deleteItem } from '@/util/api'
 
 type ItemProps = {
   listId: number

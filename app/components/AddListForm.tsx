@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Grid, TextField, Button } from '@mui/material'
-import { addList } from '../util/api'
+import { addList } from '@/util/api'
 
 type AddListFormProps = {
   refreshLists: () => any

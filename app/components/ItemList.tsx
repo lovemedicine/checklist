@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { DragDropContext, Droppable, DroppableProps } from '@hello-pangea/dnd'
 import { Checkbox, TextField } from '@mui/material'
-import Item from './Item'
-import { Item as ItemType } from '../types/models'
-import { addItem, reorderItem, fetcher } from '../util/api'
+import Item from '@/components/Item'
+import { Item as ItemType } from '@/types/models'
+import { addItem, reorderItem, fetcher } from '@/util/api'
 
 type ItemListProps = {
   listId: number,

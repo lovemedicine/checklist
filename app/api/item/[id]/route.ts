@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import prisma from '../../../prisma'
+import prisma from '@/prisma'
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const result = await prisma.item.findUnique({

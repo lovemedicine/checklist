@@ -1,5 +1,5 @@
-import List from './List'
-import { List as ListType } from '../types/models'
+import List from '@/components/List'
+import { List as ListType } from '@/types/models'
 
 type ListListProps = {
   lists: ListType[]

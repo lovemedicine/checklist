@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react'
 import useSWR from 'swr'
 import { Typography, Button, Grid } from '@mui/material'
 import { ContentCopy, BackHandOutlined, CheckCircleOutlined } from '@mui/icons-material'
-import ItemList from '../../components/ItemList'
-import { List, Item } from '../../types/models'
-import { fetcher } from '../../util/api'
+import ItemList from '@/components/ItemList'
+import { List, Item } from '@/types/models'
+import { fetcher } from '@/util/api'
 
 type ListPageProps = {
   params: {

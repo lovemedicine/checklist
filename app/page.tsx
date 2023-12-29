@@ -2,10 +2,10 @@
 
 import useSWR from 'swr'
 import { Box, Typography } from '@mui/material'
-import AddListForm from './components/AddListForm'
-import ListList from './components/ListList'
-import { List } from './types/models'
-import { fetcher } from './util/api'
+import AddListForm from '@/components/AddListForm'
+import ListList from '@/components/ListList'
+import { List } from '@/types/models'
+import { fetcher } from '@/util/api'
 
 export default function Home() {
   const { data: lists, error, isLoading, mutate: refreshLists } = useSWR<List[]>('/api/list', fetcher)

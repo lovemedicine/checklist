@@ -2,8 +2,8 @@ import TimeAgo from 'react-timeago'
 import Link from 'next/link'
 import { Card, CardContent, Typography } from '@mui/material'
 import { DeleteForever } from '@mui/icons-material'
-import { deleteList } from '../util/api'
-import { List } from '../types/models'
+import { deleteList } from '@/util/api'
+import { List } from '@/types/models'
 
 type ListProps = {
   list: List
