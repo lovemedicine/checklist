@@ -9,7 +9,6 @@ export type Item = {
 export type List = {
   id: number
   name: string
-  date: string
   createdAt: string
   items: ListItem[]
 }

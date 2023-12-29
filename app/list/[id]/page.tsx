@@ -60,7 +60,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
     <>
       <Grid container sx={{ mb: 2 }}>
         <Grid item>
-          <Typography variant="h5">List: {list.name} ({list.date})</Typography>
+          <Typography variant="h5">List: {list.name}</Typography>
         </Grid>
         <Grid item sx={{ ml: 2 }}>
           <Button

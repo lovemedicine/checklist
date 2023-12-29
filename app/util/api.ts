@@ -2,7 +2,7 @@ export function fetcher(input: RequestInfo | URL, init?: RequestInit | undefined
   return fetch(input, init).then(res => res.json())
 }
 
-export async function addList(list: { name: string, date: string }) {
+export async function addList(list: { name: string }) {
   const response = await fetch('/api/list', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -8,16 +8,15 @@ type AddListFormProps = {
 
 export default function AddListForm({ refreshLists }: AddListFormProps) {
   let [name, setName] = useState<string>("")
-  let [date, setDate] = useState<string>("")
   let [isValid, setIsValid] = useState<boolean>(true)
 
   async function handleAddList(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const trimmedName = name.trim()
 
-    if (date.length === 0 || date.match(/\d{4}-\d{2}-\d{2}/i)) {
-      await addList({ name, date })
+    if (trimmedName.length > 0) {
+      await addList({ name: trimmedName })
       setName("")
-      setDate("")
       setIsValid(true)
       refreshLists()
     } else {
@@ -27,35 +26,21 @@ export default function AddListForm({ refreshLists }: AddListFormProps) {
 
   return (
     <form onSubmit={handleAddList}>
-      <Grid container>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Name"
-            onChange={event => setName(event.target.value)}
-            value={name}
-            />
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Date (YYYY-MM-DD)"
-            onChange={event => setDate(event.target.value)}
-            value={date}
-            error={!isValid}
-            helperText={isValid ? "" : "Dates must be YYYY-MM-DD"}
-            />
-        </Grid>
-        <Grid item alignItems="stretch" style={{ display: "flex" }}>
-          &nbsp;
-          <Button
-            sx={{ textTransform: 'none' }}
-            variant="outlined"
-            type="submit"
-          >Create</Button>
-        </Grid>
+      <Grid sx={{ height: "64px" }}>
+        <TextField
+          variant="outlined"
+          size="small"
+          placeholder="Name"
+          onChange={event => setName(event.target.value)}
+          value={name}
+          error={!isValid}
+          helperText={isValid ? "" : "Name can't be blank"}
+          />
+        <Button
+          sx={{ textTransform: 'none', ml: 1, height: "40px" }}
+          variant="outlined"
+          type="submit"
+        >Create</Button>
       </Grid>
     </form>
   )

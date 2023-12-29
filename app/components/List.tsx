@@ -28,7 +28,7 @@ export default function List({ list, refreshLists }: ListProps) {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Typography variant="h5">
             <Link href={`/list/${list.id}`}>
-              {list.name} {list.date ? `(${list.date})` : ''}
+              {list.name}
             </Link>
           </Typography>
           <DeleteForever sx={{ color: 'grey' }} onClick={() => handleDelete(list.id)} />
