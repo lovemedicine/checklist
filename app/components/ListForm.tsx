@@ -35,7 +35,7 @@ export default function ListForm({ list, onSubmit }: ListFormProps) {
             sx={{ width: "100%" }}
             variant="outlined"
             size="small"
-            placeholder={list ? "Name" : "New list"}
+            placeholder="List name"
             onChange={event => setName(event.target.value)}
             value={name}
             error={!isValid}
