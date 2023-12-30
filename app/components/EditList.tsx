@@ -4,13 +4,18 @@ import { updateList } from '@/util/api'
 
 type EditListProps = {
   list: List,
-  onSave: () => any
+  onSave: (updated: boolean) => any
 }
 
 export default function EditList({ list, onSave }: EditListProps) {
   async function onSubmit(name: string) {
-    await updateList({ id: list.id, name })
-    await onSave()
+    const updated = name !== list.name
+
+    if (updated) {
+      await updateList({ id: list.id, name })
+    }
+
+    await onSave(updated)
   }
 
   return (

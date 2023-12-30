@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import useSWR from 'swr'
-import { Typography, Button, Grid } from '@mui/material'
+import { Typography, Button, Grid, Box } from '@mui/material'
 import { ContentCopy, BackHandOutlined, CheckCircleOutlined } from '@mui/icons-material'
 import ItemList from '@/components/ItemList'
 import { List, Item } from '@/types/models'
@@ -21,13 +21,6 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   } = useSWR<Item[]>(`/api/list/${id}/item`, fetcher)
   const [copied, setCopied] = useState(false)
   const [isReorderMode, setIsReorderMode] = useState(false)
-
-  const containerStyle: React.CSSProperties = isReorderMode ? {} : {
-    columnWidth: '210px',
-    columnGap: '20px',
-    columnFill: 'auto',
-    height: 'calc(100vh - 130px)'
-  }
 
   useEffect(() => {
     if (copied) {
@@ -58,11 +51,11 @@ export default function ListPage({ params: { id } }: ListPageProps) {
 
   return (
     <>
+      <Box sx={{ mb: 1 }}>
+        <Typography variant="h4">{list.name}</Typography>
+      </Box>
       <Grid container sx={{ mb: 2 }}>
         <Grid item>
-          <Typography variant="h5">List: {list.name}</Typography>
-        </Grid>
-        <Grid item sx={{ ml: 2 }}>
           <Button
             variant="outlined"
             size="small"
@@ -82,7 +75,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
         </Grid>
       </Grid>
 
-      <div style={containerStyle}>
+      <div className={isReorderMode ? 'item-list-reorder' : 'item-list-fixed'}>
         <ItemList
           listId={list.id}
           items={items}

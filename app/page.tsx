@@ -16,12 +16,7 @@ export default function Home() {
 
   return (
     <>
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="h6">Create a list</Typography>
-        <AddListForm refreshLists={refreshLists} />
-      </Box>
-
-      <Typography variant="h6">All lists</Typography>
+      <AddListForm refreshLists={refreshLists} />
       <ListList lists={lists} refreshLists={refreshLists} />
     </>
   )

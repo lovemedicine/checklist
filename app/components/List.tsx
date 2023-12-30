@@ -30,16 +30,18 @@ export default function List({ list, refreshLists }: ListProps) {
     setIsEditMode(!isEditMode)
   }
 
-  async function onSave() {
-    await refreshLists()
+  async function onSave(updated: boolean) {
+    if (updated) await refreshLists()
     setIsEditMode(false)
   }
 
   return (
-    <Card key={list.id} variant="outlined" sx={{ mt: 1 }}>
+    <Card className="list" key={list.id} variant="outlined" sx={{ mt: 1 }}>
       <CardContent sx={{ p: 1, "&:last-child": { pb: 1 } }}>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          { isEditMode && <EditList list={list} onSave={onSave} /> }
+          { isEditMode &&
+            <EditList list={list} onSave={onSave} />
+          }
           { !isEditMode &&
             <Box sx={{ display: "flex", height: "40px" }}>
               <Typography variant="h5" sx={{ mt: 0.5 }}>
@@ -47,12 +49,20 @@ export default function List({ list, refreshLists }: ListProps) {
                   {list.name}
                 </Link>
               </Typography>
-              <IconButton aria-label="edit" size="small" sx={{ ml: 1 }} onClick={toggleEditMode}>
+              <IconButton
+                className="list-edit-button"
+                aria-label="edit"
+                size="small"
+                sx={{ ml: 1 }}
+                onClick={toggleEditMode}
+              >
                 <Edit fontSize="inherit" />
               </IconButton>
             </Box>
           }
-          <DeleteForever sx={{ color: 'grey' }} onClick={() => handleDelete(list.id)} />
+          <Box sx={{ pl: 1 }}>
+            <DeleteForever sx={{ color: 'grey' }} onClick={() => handleDelete(list.id)} />
+          </Box>
         </Box>
         <Typography variant="body2">
           <TimeAgo date={list.createdAt} live={false} formatter={timeFormatter} />

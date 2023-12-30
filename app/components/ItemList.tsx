@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, DroppableProps } from '@hello-pangea/dnd'
 import { Checkbox, TextField } from '@mui/material'
 import Item from '@/components/Item'
 import { Item as ItemType } from '@/types/models'
-import { addItem, reorderItem, fetcher } from '@/util/api'
+import { addItem, reorderItem } from '@/util/api'
 
 type ItemListProps = {
   listId: number,
@@ -41,7 +41,7 @@ export default function ItemList({ listId, items, refreshItems, error, isLoading
 
   useEffect(() => {
     setOrderedItems(items || [])
-  }, [items])
+  }, [items?.map(item => item.order.toString() + item.name).join(",")])
 
   async function handleDragEnd(result: any) {
     const { destination, source } = result
@@ -54,9 +54,9 @@ export default function ItemList({ listId, items, refreshItems, error, isLoading
       return
     }
 
-    let newItems = [...(items as ItemType[])]
+    let newItems = [...orderedItems]
     newItems.splice(source.index, 1)
-    newItems.splice(destination.index, 0, (items as ItemType[])[source.index])
+    newItems.splice(destination.index, 0, orderedItems[source.index])
     setOrderedItems(newItems)
 
     await reorderItem({ from: source.index + 1, to: destination.index + 1 })

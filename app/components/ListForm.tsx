@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Grid, TextField, Button, CircularProgress } from '@mui/material'
+import { Box, TextField, Button, CircularProgress } from '@mui/material'
 import { List } from '@/types/models'
 
 type ListFormProps = {
@@ -18,42 +18,48 @@ export default function ListForm({ list, onSubmit }: ListFormProps) {
 
     if (trimmedName.length > 0) {
       setIsLoading(true)
-      console.log("handler", isLoading)
       await onSubmit(trimmedName)
       if (!list) setName("")
       setIsValid(true)
       setIsLoading(false)
-      console.log("handler", isLoading)
     } else {
       setIsValid(false)
     }
   }
 
-  console.log("component", isLoading)
-
   return (
-    <form onSubmit={handleSubmit}>
-      <Grid>
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="Name"
-          onChange={event => setName(event.target.value)}
-          value={name}
-          error={!isValid}
-          helperText={isValid ? "" : "Name can't be blank"}
-          disabled={isLoading}
-          />
+    <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+      <Box sx={{ display: "flex", width: "100%", maxWidth: "400px" }}>
+        <Box sx={{ flexGrow: 4 }}>
+          <TextField
+            sx={{ width: "100%" }}
+            variant="outlined"
+            size="small"
+            placeholder={list ? "Name" : "New list"}
+            onChange={event => setName(event.target.value)}
+            value={name}
+            error={!isValid}
+            helperText={isValid ? "" : "Name can't be blank"}
+            disabled={isLoading}
+            />
+        </Box>
 
-        <Button
-          sx={{ textTransform: 'none', ml: 1, height: "40px" }}
-          variant="outlined"
-          type="submit"
-          disabled={isLoading}
-        >{ list ? 'Save' : 'Create' }</Button>
+        <Box sx={{ flexGrow: 2, ml: 1 }}>
+          <Button
+            sx={{ textTransform: 'none', height: "40px", width: "100%" }}
+            variant="outlined"
+            type="submit"
+            disabled={isLoading}
+          >{ list ? 'Done' : 'Create' }</Button>
+        </Box>
 
-        { isLoading && <CircularProgress size="1.5rem" sx={{ ml: 1, position: "relative", top: "7px" }} /> }
-      </Grid>
+        <Box sx={{ flexGrow: 1, pl: 1 }}>
+          <CircularProgress
+            size="1.5rem"
+            sx={{ position: "relative", top: "7px", visibility: isLoading ? "visible" : "hidden" }}
+            />
+        </Box>
+      </Box>
     </form>
   )
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
-import { Checkbox } from '@mui/material'
+import { Checkbox, Typography } from '@mui/material'
 import { DeleteForever } from '@mui/icons-material'
 import { Item as ItemType } from '@/types/models'
 import { addListItem, removeListItem, deleteItem } from '@/util/api'
@@ -42,10 +42,13 @@ export default function Item({ item, listId, selected, index, onDelete, enableDr
           <div className="item" style={{ display: "flex", justifyContent: "space-between" }}>
             <div>
               <Checkbox checked={checked} onChange={handleChange} sx={{ padding: '5px' }} />
-              &nbsp;{item.name}
+              &nbsp;
+              <div className="item-name">
+                {item.name}
+              </div>
             </div>
-            <div>
-              <DeleteForever className="item-delete-button" sx={{ color: 'grey', position: 'relative', top: 5 }} onClick={handleDelete} />
+            <div className="item-delete" style={{ display: "inline-block", verticalAlign: "middle" }}>
+              <DeleteForever className="item-delete-button" sx={{ color: 'grey', position: 'relative', top: 10 }} onClick={handleDelete} />
             </div>
           </div>
         </div>
