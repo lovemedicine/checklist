@@ -1,7 +1,6 @@
 'use client'
 
 import useSWR from 'swr'
-import { Box, Typography } from '@mui/material'
 import AddListForm from '@/components/AddListForm'
 import ListList from '@/components/ListList'
 import { List } from '@/types/models'
