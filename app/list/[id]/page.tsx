@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import useSWR from 'swr'
 import { Typography, Button, Grid, Box } from '@mui/material'
-import { ContentCopy, BackHandOutlined, CheckCircleOutlined } from '@mui/icons-material'
+import { ContentCopy, Reorder, CheckCircleOutlined } from '@mui/icons-material'
 import ItemList from '@/components/ItemList'
 import { List, Item } from '@/types/models'
 import { fetcher } from '@/util/api'
@@ -59,15 +59,15 @@ export default function ListPage({ params: { id } }: ListPageProps) {
           <Button
             variant="outlined"
             size="small"
-            startIcon={isReorderMode ? <CheckCircleOutlined /> : <BackHandOutlined />}
+            startIcon={isReorderMode ? <CheckCircleOutlined /> : <Reorder />}
             onClick={handleToggleReorderMode}
           >
-            { isReorderMode ? "Finish Reorder" : "Reorder Items" }
+            { isReorderMode ? "Finish Reorder" : "Reorder" }
           </Button>
         </Grid>
         <Grid item sx={{ ml: 2 }}>
           <Button variant="outlined" size="small" startIcon={<ContentCopy />} onClick={handleCopy}>
-            Copy selected
+            Copy
           </Button>
         </Grid>
         <Grid item sx={{ p: '5px', pl: '10px', color: 'grey' }}>

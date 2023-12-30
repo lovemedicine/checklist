@@ -44,6 +44,6 @@ a {
     column-width: 210px;
     column-gap: 20px;
     column-fill: auto;
-    height: calc(100vh - 130px);
+    height: calc(100vh - 180px);
   }
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
-import { Checkbox, Typography } from '@mui/material'
+import { Checkbox, CircularProgress } from '@mui/material'
 import { DeleteForever } from '@mui/icons-material'
 import { Item as ItemType } from '@/types/models'
 import { addListItem, removeListItem, deleteItem } from '@/util/api'
@@ -10,12 +10,13 @@ type ItemProps = {
   item: ItemType
   selected: boolean
   index: number
-  onDelete: () => any
+  onDelete: (id: number) => any
   enableDrag: boolean
 }
 
 export default function Item({ item, listId, selected, index, onDelete, enableDrag }: ItemProps) {
-  const [checked, setChecked] = useState<boolean>(selected)
+  const [checked, setChecked] = useState(selected)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const data = { listId, itemId: item.id }
@@ -31,8 +32,10 @@ export default function Item({ item, listId, selected, index, onDelete, enableDr
   }
 
   async function handleDelete() {
+    setIsDeleting(true)
     await deleteItem(item.id)
-    onDelete()
+    setIsDeleting(false)
+    onDelete(item.id)
   }
 
   return (
@@ -48,7 +51,16 @@ export default function Item({ item, listId, selected, index, onDelete, enableDr
               </div>
             </div>
             <div className="item-delete" style={{ display: "inline-block", verticalAlign: "middle" }}>
-              <DeleteForever className="item-delete-button" sx={{ color: 'grey', position: 'relative', top: 10 }} onClick={handleDelete} />
+              { isDeleting &&
+                <CircularProgress size="1.5rem" sx={{ position: "relative", top: "7px" }} />
+              }
+              { !isDeleting &&
+                <DeleteForever
+                  className="item-delete-button"
+                  sx={{ color: 'grey', position: 'relative', top: 10 }}
+                  onClick={handleDelete}
+                  />
+              }
             </div>
           </div>
         </div>

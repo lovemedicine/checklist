@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { DragDropContext, Droppable, DroppableProps } from '@hello-pangea/dnd'
-import { Checkbox, TextField } from '@mui/material'
 import Item from '@/components/Item'
+import AddItemForm from '@/components/AddItemForm'
 import { Item as ItemType } from '@/types/models'
-import { addItem, reorderItem } from '@/util/api'
+import { reorderItem } from '@/util/api'
 
 type ItemListProps = {
   listId: number,
@@ -36,12 +36,16 @@ const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
 }
 
 export default function ItemList({ listId, items, refreshItems, error, isLoading, enableDrag }: ItemListProps) {
-  const [newItem, setNewItem] = useState<string>("")
   const [orderedItems, setOrderedItems] = useState<ItemType[]>(items || [])
 
   useEffect(() => {
     setOrderedItems(items || [])
   }, [items?.map(item => item.order.toString() + item.name).join(",")])
+
+
+  if (error) return <div>Error loading list</div>
+  if (isLoading) return <div>Loading...</div>
+  if (!orderedItems) return null
 
   async function handleDragEnd(result: any) {
     const { destination, source } = result
@@ -62,19 +66,14 @@ export default function ItemList({ listId, items, refreshItems, error, isLoading
     await reorderItem({ from: source.index + 1, to: destination.index + 1 })
   }
 
-  async function handleAddItem(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    if (newItem.length > 0) {
-      await addItem({ listId, name: newItem })
-      await refreshItems()
-      setNewItem("")
-    }
+  async function onDelete(id: number) {
+    setOrderedItems(items => items.filter(item => item.id !== id))
+    refreshItems()
   }
 
-  if (error) return <div>Error loading list</div>
-  if (isLoading) return <div>Loading...</div>
-  if (!items) return null
+  async function onAddItemFormSubmit() {
+    await refreshItems()
+  }
 
   return (
     <>
@@ -88,7 +87,7 @@ export default function ItemList({ listId, items, refreshItems, error, isLoading
                   listId={listId}
                   item={item}
                   selected={item.lists.length > 0} index={index}
-                  onDelete={refreshItems}
+                  onDelete={onDelete}
                   enableDrag={enableDrag}
                   />
               )) }
@@ -98,18 +97,11 @@ export default function ItemList({ listId, items, refreshItems, error, isLoading
         </StrictModeDroppable>
       </DragDropContext>
 
-      <form onSubmit={handleAddItem} style={{ display: 'inline-block' }}>
-        <Checkbox checked={true} disabled={true} sx={{ padding: '5px' }} />&nbsp;
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="New item"
-          onChange={event => setNewItem(event.target.value)}
-          value={newItem}
-          autoComplete='off'
-          sx={{ width: '170px' }}
-          />
-      </form>
+      <AddItemForm
+        listId={listId}
+        itemNames={orderedItems.map(item => item.name)}
+        onSubmit={onAddItemFormSubmit}
+        />
     </>
   )
 }

@@ -32,6 +32,7 @@ export async function addItem({ listId, name }: { listId: number, name: string }
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name }),
   })
+  return await response.json()
 }
 
 export async function addListItem({ listId, itemId }: { listId: number, itemId: number }) {
