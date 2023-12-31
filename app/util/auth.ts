@@ -1,8 +1,10 @@
+import { NextResponse } from 'next/server'
 import GoogleProvider from "next-auth/providers/google"
-import { NextAuthOptions } from "next-auth"
+import { getServerSession } from 'next-auth/next'
+import type { Session, NextAuthOptions } from 'next-auth'
 import prisma from '@/prisma'
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET as string,
   providers: [
     GoogleProvider({
@@ -11,8 +13,8 @@ const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async session({ session, token }: any) {
-      if (session.user) {
+    async session({ session, token }) {
+      if (session.user && token.sub) {
         session.user.googleId = token.sub as string
 
         if (!session.user.id) {
@@ -37,4 +39,17 @@ const authOptions: NextAuthOptions = {
   }
 }
 
-export { authOptions }
+export async function getUserId(): Promise<number> {
+  const session = await getServerSession(authOptions)
+  return (session as Session).user.id
+}
+
+export async function withUser(fn: (user: Session['user']) => Promise<NextResponse<unknown>>) {
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 403 })
+  }
+
+  return fn(session.user)
+}

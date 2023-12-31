@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/prisma'
+import { getUserId } from '@/util/auth'
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const userId = await getUserId()
   const result = await prisma.item.findUnique({
     where: {
-      id: parseInt(params.id)
+      id: parseInt(params.id),
+      userId
     },
     select: {
       order: true
@@ -19,11 +22,12 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     await prisma.item.delete({
       where: {
         id: parseInt(params.id),
+        userId
       },
     })
 
     await tx.item.updateMany({
-      where: { order: { gt: result.order } },
+      where: { order: { gt: result.order }, userId },
       data: { order: { decrement: 1 } },
     })
   })

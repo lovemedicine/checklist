@@ -1,13 +1,20 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/prisma'
+import { getUserId } from '@/util/auth'
 
 export async function GET(request: Request) {
-  const result = await prisma.item.findMany({ orderBy: { order: 'asc' }})
+  const userId = await getUserId()
+  const result = await prisma.item.findMany({
+    where: { userId },
+    orderBy: { order: 'asc' }
+  })
   return NextResponse.json(result)
 }
 
 export async function POST(request: Request) {
-  const data = await request.json()
+  const userId = await getUserId()
+  let data = await request.json()
+  data.userId = userId
   const result = await prisma.item.create({ data })
   return NextResponse.json(result)
 }
@@ -27,12 +34,13 @@ function getUpsAndDowns(from: number, to: number): { ups?: number[] | undefined,
 }
 
 export async function PUT(request: Request) {
+  const userId = await getUserId()
   const { from, to } = await request.json()
   const { ups, downs } = getUpsAndDowns(from, to)
 
   await prisma.$transaction(async (tx) => {
     await tx.item.update({
-      where: { order: from },
+      where: { order: from, userId },
       data: { order: -1 },
     })
 
@@ -43,20 +51,21 @@ export async function PUT(request: Request) {
       // see: https://stackoverflow.com/questions/7703196/sqlite-increment-unique-integer-field
 
       const { _max: { order: maxOrder } } = await prisma.item.aggregate({
+        where: { userId },
         _max: { order: true },
       })
 
       const diff = (maxOrder as number) - Math.min(...ups)
 
       await tx.item.updateMany({
-        where: { order: { in: ups } },
+        where: { order: { in: ups }, userId },
         data: { order: { increment: diff + 1 } },
       })
 
       const newUps = ups.map(order => order + diff + 1)
 
       await tx.item.updateMany({
-        where: { order: { in: newUps } },
+        where: { order: { in: newUps }, userId },
         data: { order: { decrement: diff } },
       })
     }
@@ -68,31 +77,35 @@ export async function PUT(request: Request) {
       // see: https://stackoverflow.com/questions/7703196/sqlite-increment-unique-integer-field
 
       const { _max: { order: maxOrder } } = await prisma.item.aggregate({
+        where: { userId },
         _max: { order: true },
       })
 
       const diff = (maxOrder as number) - Math.min(...downs)
 
       await tx.item.updateMany({
-        where: { order: { in: downs } },
+        where: { order: { in: downs }, userId },
         data: { order: { increment: diff + 1 } },
       })
 
       const newDowns = downs.map(order => order + diff + 1)
 
       await tx.item.updateMany({
-        where: { order: { in: newDowns } },
+        where: { order: { in: newDowns }, userId },
         data: { order: { decrement: diff + 2 } },
       })
     }
 
     await tx.item.update({
-      where: { order: -1 },
+      where: { order: -1, userId },
       data: { order: to },
     })
   })
 
-  const items = await prisma.item.findMany({ orderBy: { order: 'asc' } })
+  const items = await prisma.item.findMany({
+    where: { userId },
+    orderBy: { order: 'asc' }
+  })
   const itemNames = items.map(item => item.name)
   return NextResponse.json(itemNames)
 }
