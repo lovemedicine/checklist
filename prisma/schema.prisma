@@ -11,6 +11,12 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
+model User {
+  id          Int         @id @default(autoincrement())
+  googleId    String      @unique
+  createdAt   DateTime    @default(now())
+}
+
 model Item {
   id          Int         @id @default(autoincrement())
   name        String      @unique

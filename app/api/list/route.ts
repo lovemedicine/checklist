@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/prisma'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from '@/util/auth'
 
 export async function GET(request: Request) {
-  const result = await prisma.list.findMany({ orderBy: { id: 'desc' }})
+  const session = await getServerSession(authOptions)
+
+  if (!session) {
+    return new Response("Unauthorized", { status: 403 })
+  }
+
+  const result = await prisma.list.findMany({
+    orderBy: { id: 'desc' }
+  })
   return NextResponse.json(result)
 }
 

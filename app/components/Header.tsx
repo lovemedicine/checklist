@@ -6,7 +6,6 @@ import Link from 'next/link'
 
 export default function Header() {
   const { data: session } = useSession()
-  console.log(session?.user)
 
   const style = {
     backgroundColor: "#eee",

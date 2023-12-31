@@ -39,10 +39,22 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   if (isLoading) return <div>Loading...</div>
   if (!list) return null
 
-  function handleCopy(event: React.MouseEvent<HTMLButtonElement>) {
-    const itemsText = (items as Item[]).filter(item => item.lists.length > 0).map(item => item.name).join("\n")
-    navigator.clipboard.writeText(itemsText)
-    setCopied(true)
+  function handleCopyAll(event: React.MouseEvent<HTMLButtonElement>) {
+    const itemsText = items?.map(item => item.name).join("\n")
+
+    if (itemsText) {
+      navigator.clipboard.writeText(itemsText)
+      setCopied(true)
+    }
+  }
+
+  function handleCopySelected(event: React.MouseEvent<HTMLButtonElement>) {
+    const itemsText = items?.filter(item => item.lists.length > 0).map(item => item.name).join("\n")
+
+    if (itemsText) {
+      navigator.clipboard.writeText(itemsText)
+      setCopied(true)
+    }
   }
 
   function handleToggleReorderMode() {
@@ -66,8 +78,13 @@ export default function ListPage({ params: { id } }: ListPageProps) {
           </Button>
         </Grid>
         <Grid item sx={{ ml: 2 }}>
-          <Button variant="outlined" size="small" startIcon={<ContentCopy />} onClick={handleCopy}>
-            Copy
+          <Button variant="outlined" size="small" startIcon={<ContentCopy />} onClick={handleCopySelected}>
+            Copy selected
+          </Button>
+        </Grid>
+        <Grid item sx={{ ml: 2 }}>
+          <Button variant="outlined" size="small" startIcon={<ContentCopy />} onClick={handleCopyAll}>
+            Copy all
           </Button>
         </Grid>
         <Grid item sx={{ p: '5px', pl: '10px', color: 'grey' }}>
