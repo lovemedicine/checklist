@@ -37,7 +37,7 @@ export default function List({ list, refreshLists }: ListProps) {
 
   return (
     <Card className="list" variant="outlined" sx={{ mt: 1 }}>
-      <CardContent sx={{ p: 1, "&:last-child": { pb: 1 } }}>
+      <CardContent sx={{ p: 1, pl: 2, "&:last-child": { pb: 1 } }}>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           { isEditMode &&
             <EditList list={list} onSave={onSave} />
