@@ -1,14 +1,14 @@
 import { PrismaClient } from '@prisma/client'
+import config from '@/config'
 
 const prisma = new PrismaClient()
-const googleId = process.env.SEED_USER_GOOGLE_ID
-
-if (googleId !== undefined) {
-  throw new Error("Can't create seed data without SEED_USER_GOOGLE_ID set in env")
-}
 
 async function main() {
-  const user1 = await prisma.user.create({ data: { googleId: (googleId as string) } })
+  const user1 = await prisma.user.create({
+    data: {
+      id: config.singleUserId,
+    }
+  })
 
   const item1 = await prisma.item.create({
     data: {

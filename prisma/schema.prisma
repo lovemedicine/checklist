@@ -13,7 +13,7 @@ datasource db {
 
 model User {
   id          Int         @id @default(autoincrement())
-  googleId    String      @unique
+  googleId    String?     @unique
   createdAt   DateTime    @default(now())
   lists       List[]
   items       Item[]

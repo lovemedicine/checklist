@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import { getServerSession } from 'next-auth/next'
 import type { Session, NextAuthOptions } from 'next-auth'
 import prisma from '@/prisma'
+import config from '@/config'
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET as string,
@@ -43,9 +44,17 @@ export const authOptions: NextAuthOptions = {
   }
 }
 
+export function isAuthEnabled(): boolean {
+  return process.env.USER_MODE === 'auth'
+}
+
 export async function getUserId(): Promise<number> {
-  const session = await getServerSession(authOptions)
-  return (session as Session).user.id
+  if (isAuthEnabled()) {
+    const session = await getServerSession(authOptions)
+    return (session as Session).user.id
+  } else {
+    return config.singleUserId
+  }
 }
 
 export async function withUser(fn: (user: Session['user']) => Promise<NextResponse<unknown>>) {
