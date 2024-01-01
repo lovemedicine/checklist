@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import TimeAgo from 'react-timeago'
 import Link from 'next/link'
-import { Box, Card, CardContent, Typography, IconButton } from '@mui/material'
+import { Box, Card, CardContent, Typography, IconButton, CircularProgress } from '@mui/material'
 import { DeleteForever, Edit } from '@mui/icons-material'
 import EditList from '@/components/EditList'
 import { deleteList } from '@/util/api'
@@ -14,6 +14,10 @@ type ListProps = {
 
 export default function List({ list, refreshLists }: ListProps) {
   const [isEditMode, setIsEditMode] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleted, setIsDeleted] = useState(false)
+
+  if (isDeleted) return null
 
   const timeFormatter = (value: number, unit: TimeAgo.Unit, suffix: TimeAgo.Suffix) => {
     if (unit === 'second') return 'just now';
@@ -22,8 +26,11 @@ export default function List({ list, refreshLists }: ListProps) {
   }
 
   async function handleDelete(id: number) {
+    setIsDeleting(true)
     await deleteList(id)
+    setIsDeleted(true)
     refreshLists()
+    setIsDeleting(false)
   }
 
   function toggleEditMode() {
@@ -61,7 +68,12 @@ export default function List({ list, refreshLists }: ListProps) {
             </Box>
           }
           <Box sx={{ pl: 1 }}>
-            <DeleteForever sx={{ color: 'grey' }} onClick={() => handleDelete(list.id)} />
+            { !isDeleting &&
+              <DeleteForever sx={{ color: 'grey' }} onClick={() => handleDelete(list.id)} />
+            }
+            { isDeleting &&
+              <CircularProgress size="1.5rem" />
+            }
           </Box>
         </Box>
         <Typography variant="body2">
