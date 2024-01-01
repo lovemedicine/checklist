@@ -40,7 +40,7 @@ export async function PUT(request: Request) {
 
   await prisma.$transaction(async (tx) => {
     await tx.item.update({
-      where: { order: from, userId },
+      where: { order_userId: { order: from, userId } },
       data: { order: -1 },
     })
 
@@ -97,7 +97,7 @@ export async function PUT(request: Request) {
     }
 
     await tx.item.update({
-      where: { order: -1, userId },
+      where: { order_userId: { order: -1, userId } },
       data: { order: to },
     })
   })
