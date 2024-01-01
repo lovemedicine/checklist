@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import useSWR from 'swr'
+import Link from 'next/link'
 import { Typography, Button, Grid, Box } from '@mui/material'
-import { ContentCopy, Reorder, CheckCircleOutlined } from '@mui/icons-material'
+import { ContentCopy, Reorder, CheckCircleOutlined, ChevronLeft } from '@mui/icons-material'
 import ItemList from '@/components/ItemList'
 import { List, Item } from '@/types/models'
 import { fetcher } from '@/util/api'
@@ -64,7 +65,10 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   return (
     <>
       <Box sx={{ mb: 1 }}>
-        <Typography variant="h4">{list.name}</Typography>
+        <Link href="/">&laquo; All lists</Link>
+      </Box>
+      <Box className="list-name" sx={{ mb: 1 }}>
+        <Typography variant="h3" sx={{ fontFamily: 'monospace' }}>{list.name}</Typography>
       </Box>
       <Grid container sx={{ mb: 2 }}>
         <Grid item>

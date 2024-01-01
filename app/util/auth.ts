@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import GoogleProvider from "next-auth/providers/google"
 import { getServerSession } from 'next-auth/next'
 import type { Session, NextAuthOptions } from 'next-auth'
@@ -45,24 +44,14 @@ export const authOptions: NextAuthOptions = {
 }
 
 export function isAuthEnabled(): boolean {
-  return process.env.USER_MODE === 'auth'
+  return process.env.NEXT_PUBLIC_USER_MODE === 'auth'
 }
 
 export async function getUserId(): Promise<number> {
   if (isAuthEnabled()) {
     const session = await getServerSession(authOptions)
-    return (session as Session).user.id
-  } else {
-    return config.singleUserId
-  }
-}
-
-export async function withUser(fn: (user: Session['user']) => Promise<NextResponse<unknown>>) {
-  const session = await getServerSession(authOptions)
-
-  if (!session?.user?.id) {
-    return new NextResponse("Unauthorized", { status: 403 })
+    if (session?.user?.id) return session.user.id
   }
 
-  return fn(session.user)
+  return config.singleUserId
 }
