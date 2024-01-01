@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Checkbox, TextField, CircularProgress, Box } from '@mui/material'
 import { addItem } from '@/util/api'
 
@@ -16,6 +16,13 @@ export default function AddItemForm({ listId, itemNames, onSubmit }: AddItemForm
   const [name, setName] = useState<string>("")
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(true)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!isSaving && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isSaving])
 
   const nameMap = itemNames.reduce((map, name) => {
     map[name] = true
@@ -56,6 +63,7 @@ export default function AddItemForm({ listId, itemNames, onSubmit }: AddItemForm
         disabled={isSaving}
         error={!isValid}
         helperText={isValid ? "" : "Item already exists"}
+        inputRef={inputRef}
         />
       <Box sx={{ display: 'inline-block', ml: 1 }}>
         { isSaving &&
