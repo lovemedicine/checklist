@@ -1,14 +1,15 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { Box, Typography, Button } from '@mui/material'
 import Link from 'next/link'
+import { Box, Typography, Button } from '@mui/material'
 import { isAuthEnabled } from '@/util/auth'
 
 export default function Auth() {
+  const { data: session } = useSession()
+
   if (!isAuthEnabled()) return null
 
-  const { data: session } = useSession()
   const buttonText = session?.user ? 'Logout' : 'Sign in'
   const endpoint = session?.user ? 'signout' : 'signin'
 
