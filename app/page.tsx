@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import AddListForm from '@/components/AddListForm'
+import AddListButton from '@/components/AddListButton'
 import ListList from '@/components/ListList'
 import { List } from '@/types/models'
 import { fetcher } from '@/util/api'
@@ -15,7 +15,7 @@ export default function Home() {
 
   return (
     <>
-      <AddListForm refreshLists={refreshLists} />
+      <AddListButton refreshLists={refreshLists} />
       <ListList lists={lists} refreshLists={refreshLists} />
     </>
   )
