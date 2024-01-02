@@ -5,11 +5,11 @@ import { Box, Card, CardContent, Typography, IconButton, CircularProgress } from
 import { DeleteForever, Edit } from '@mui/icons-material'
 import EditList from '@/components/EditList'
 import { deleteList } from '@/util/api'
-import { List } from '@/types/models'
+import { List as ListType } from '@/types/models'
 
 type ListProps = {
-  list: List
-  refreshLists: () => any
+  list: ListType
+  refreshLists: (lists?: ListType[]) => any
 }
 
 export default function List({ list, refreshLists }: ListProps) {
@@ -27,9 +27,9 @@ export default function List({ list, refreshLists }: ListProps) {
 
   async function handleDelete(id: number) {
     setIsDeleting(true)
-    await deleteList(id)
+    const lists = await deleteList(id)
     setIsDeleted(true)
-    refreshLists()
+    refreshLists(lists)
     setIsDeleting(false)
   }
 

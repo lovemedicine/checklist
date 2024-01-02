@@ -10,7 +10,7 @@ type ItemProps = {
   item: ItemType
   selected: boolean
   index: number
-  onDelete: (id: number) => any
+  onDelete: (items: ItemType[]) => any
   enableDrag: boolean
 }
 
@@ -33,9 +33,9 @@ export default function Item({ item, listId, selected, index, onDelete, enableDr
 
   async function handleDelete() {
     setIsDeleting(true)
-    await deleteItem(item.id)
+    const items = await deleteItem(item.id)
     setIsDeleting(false)
-    onDelete(item.id)
+    onDelete(items)
   }
 
   return (

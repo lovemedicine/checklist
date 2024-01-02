@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/prisma'
 import { getUserId } from '@/util/auth'
+import { findOrderedItems } from '@/util/db'
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const userId = await getUserId()
@@ -32,5 +33,6 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     })
   })
 
-  return NextResponse.json({ deleted: params.id })
+  const items = await findOrderedItems(userId)
+  return NextResponse.json(items)
 }

@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/prisma'
 import { getUserId } from '@/util/auth'
+import { findOrderedItems } from '@/util/db'
 
 export async function GET(request: Request) {
   const userId = await getUserId()
-  const result = await prisma.item.findMany({
-    where: { userId },
-    orderBy: { order: 'asc' }
-  })
+  const result = await findOrderedItems(userId)
   return NextResponse.json(result)
 }
 
@@ -15,9 +13,11 @@ export async function POST(request: Request) {
   const userId = await getUserId()
   let data = await request.json()
   data.userId = userId
-  const result = await prisma.item.create({ data })
-  return NextResponse.json(result)
+  await prisma.item.create({ data })
+  const items = await findOrderedItems(userId)
+  return NextResponse.json(items)
 }
+
 
 function getUpsAndDowns(from: number, to: number): { ups?: number[] | undefined, downs?: number[] } {
   const range = (start: number, stop: number) => Array.from({ length: stop - start + 1 }, (_, i) => start + i)
@@ -102,10 +102,6 @@ export async function PUT(request: Request) {
     })
   })
 
-  const items = await prisma.item.findMany({
-    where: { userId },
-    orderBy: { order: 'asc' }
-  })
-  const itemNames = items.map(item => item.name)
-  return NextResponse.json(itemNames)
+  const items = await findOrderedItems(userId)
+  return NextResponse.json(items)
 }

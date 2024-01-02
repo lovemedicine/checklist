@@ -30,9 +30,10 @@ export async function updateList({ id, name }: { id: number, name: string }) {
 }
 
 export async function deleteList(id: number) {
-  await fetch(`/api/list/${id}`, {
+  const response = await fetch(`/api/list/${id}`, {
     method: 'DELETE',
   })
+  return response.json()
 }
 
 export async function addItem({ listId, name }: { listId: number, name: string }) {
@@ -48,12 +49,14 @@ export async function addListItem({ listId, itemId }: { listId: number, itemId: 
   const response = await fetch(`/api/list/${listId}/item/${itemId}`, {
     method: 'PUT'
   })
+  return response.json()
 }
 
 export async function removeListItem({ listId, itemId }: { listId: number, itemId: number }) {
   const response = await fetch(`/api/list/${listId}/item/${itemId}`, {
     method: 'DELETE',
   })
+  return response.json()
 }
 
 export async function reorderItem({ from, to }: { from: number, to: number }) {
@@ -62,10 +65,12 @@ export async function reorderItem({ from, to }: { from: number, to: number }) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ from, to }),
   })
+  return response.json()
 }
 
 export async function deleteItem(id: number) {
   const response = await fetch(`/api/item/${id}`, {
     method: 'DELETE'
   })
+  return response.json()
 }

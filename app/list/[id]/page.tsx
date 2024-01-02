@@ -17,7 +17,7 @@ type ListPageProps = {
 
 export default function ListPage({ params: { id } }: ListPageProps) {
   const { data: list, error, isLoading, mutate: refreshList } = useSWR<List>(`/api/list/${id}`, fetcher)
-  const [items, setItems] = useState<Item[] | null>(null)
+  const { data: items } = useSWR<Item[]>(`/api/list/${id}/item`, fetcher)
   const [copied, setCopied] = useState(false)
   const [isReorderMode, setIsReorderMode] = useState(false)
 
@@ -38,7 +38,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   if (isLoading) return <div>Loading...</div>
   if (!list) return null
 
-  function handleCopyAll(event: React.MouseEvent<HTMLButtonElement>) {
+  async function handleCopyAll(event: React.MouseEvent<HTMLButtonElement>) {
     const itemsText = items?.map(item => item.name).join("\n")
 
     if (itemsText) {
@@ -97,7 +97,6 @@ export default function ListPage({ params: { id } }: ListPageProps) {
       <div className={isReorderMode ? 'item-list-reorder' : 'item-list-fixed'}>
         <ItemList
           listId={list.id}
-          onItemsUpdate={setItems}
           enableDrag={isReorderMode}
           />
       </div>

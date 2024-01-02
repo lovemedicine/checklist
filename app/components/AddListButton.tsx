@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { Button, CircularProgress } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import { addList } from '@/util/api'
+import { List } from '@/types/models'
 
 type AddListButtonProps = {
-  refreshLists: () => any
+  refreshLists: (lists: List[]) => any
 }
 
 export default function AddListButton({ refreshLists }: AddListButtonProps) {
@@ -12,8 +13,9 @@ export default function AddListButton({ refreshLists }: AddListButtonProps) {
 
   async function handleClick(event: React.MouseEvent<HTMLElement>) {
     setIsSending(true)
-    await addList({ name: 'untitled list' })
-    await refreshLists()
+    const lists = await addList({ name: 'untitled list' })
+    console.log("result of adding list", lists)
+    await refreshLists(lists)
     setIsSending(false)
   }
 

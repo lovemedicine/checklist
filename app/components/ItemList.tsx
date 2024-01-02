@@ -8,7 +8,6 @@ import { reorderItem, createFetcherWithCallback } from '@/util/api'
 
 type ItemListProps = {
   listId: number,
-  onItemsUpdate: (items: ItemType[]) => any
   enableDrag: boolean
 }
 
@@ -37,9 +36,17 @@ type ItemMap = {
   [key: number]: ItemType
 }
 
+function getSortedItemIds(items: ItemType[]): number[] {
+  return items.sort((a, b) => a.order - b.order).map(item => item.id)
+}
+
 function getOrderedItems(items: ItemType[] | undefined, orderedItemIds: number[]): ItemType[] {
-  if (!items) {
+  if (!items?.length) {
     return []
+  }
+
+  if (!orderedItemIds?.length) {
+    orderedItemIds = getSortedItemIds(items)
   }
 
   const itemMap = items.reduce((map, item) => {
@@ -50,26 +57,23 @@ function getOrderedItems(items: ItemType[] | undefined, orderedItemIds: number[]
   return orderedItemIds.map(id => itemMap[id])
 }
 
-export default function ItemList({ listId, onItemsUpdate, enableDrag }: ItemListProps) {
+export default function ItemList({ listId, enableDrag }: ItemListProps) {
   const [orderedItemIds, setOrderedItemIds] = useState<number[]>([])
 
   const {
     data: items, error, isLoading, mutate: refreshItems
-  } = useSWR<ItemType[]>(
-    `/api/list/${listId}/item`,
+  } = useSWR<ItemType[]>(`/api/list/${listId}/item`,
     createFetcherWithCallback<ItemType[]>(items => {
-      onItemsUpdate(items)
-      setOrderedItemIds(
-        items.sort((a, b) => a.order - b.order).map(item => item.id)
-      )
+      setOrderedItemIds(getSortedItemIds(items))
     })
   )
 
   if (error) return <div>Error loading list</div>
   if (isLoading) return <div>Loading...</div>
-  if (!items?.length) return null
 
   const orderedItems = getOrderedItems(items, orderedItemIds)
+
+  if (!orderedItems?.length) return null
 
   async function handleDragEnd(result: any) {
     const { destination, source } = result
@@ -84,17 +88,17 @@ export default function ItemList({ listId, onItemsUpdate, enableDrag }: ItemList
       return newItemIds
     })
 
-    await reorderItem({ from: source.index + 1, to: destination.index + 1 })
-    refreshItems()
+    const items = await reorderItem({ from: source.index + 1, to: destination.index + 1 })
+    refreshItems(items)
   }
 
-  async function onDelete(id: number) {
-    setOrderedItemIds(itemIds => itemIds.filter(itemId => itemId !== id))
-    refreshItems()
+  function onDelete(items: ItemType[]) {
+    setOrderedItemIds(items.map(item => item.id))
+    refreshItems(items)
   }
 
-  async function onAddItemFormSubmit() {
-    await refreshItems()
+  function onAddItemFormSubmit(items: ItemType[]) {
+    refreshItems(items)
   }
 
   return (

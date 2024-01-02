@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/prisma'
 import { getUserId } from '@/util/auth'
+import { findOrderedLists } from '@/util/db'
 
 type Params = { params: { id: string } }
 
@@ -24,7 +25,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
 export async function DELETE(request: Request, { params }: Params) {
   const userId = await getUserId()
-  const result = await prisma.list.delete({
+  await prisma.list.delete({
     where: {
       id: parseInt(params.id),
       userId
@@ -33,6 +34,7 @@ export async function DELETE(request: Request, { params }: Params) {
       items: true
     },
   })
-  return NextResponse.json(result)
+  const lists = await findOrderedLists(userId)
+  return NextResponse.json(lists)
 }
 
