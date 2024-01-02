@@ -14,7 +14,6 @@ export default function AddListButton({ refreshLists }: AddListButtonProps) {
   async function handleClick(event: React.MouseEvent<HTMLElement>) {
     setIsSending(true)
     const lists = await addList({ name: 'untitled list' })
-    console.log("result of adding list", lists)
     await refreshLists(lists)
     setIsSending(false)
   }

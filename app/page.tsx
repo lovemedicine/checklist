@@ -13,8 +13,6 @@ export default function Home() {
   if (isLoading) return <div>Loading...</div>
   if (!lists) return null
 
-  console.log("lists", lists)
-
   return (
     <>
       <AddListButton refreshLists={refreshLists} />
