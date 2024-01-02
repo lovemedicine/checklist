@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import useSWR from 'swr'
 import { DragDropContext, Droppable, DroppableProps } from '@hello-pangea/dnd'
 import Item from '@/components/Item'
 import AddItemForm from '@/components/AddItemForm'
 import { Item as ItemType } from '@/types/models'
-import { reorderItem } from '@/util/api'
+import { reorderItem, createFetcherWithCallback } from '@/util/api'
 
 type ItemListProps = {
   listId: number,
-  items: ItemType[] | undefined,
-  refreshItems: () => any,
-  error: any,
-  isLoading: boolean,
+  onItemsUpdate: (items: ItemType[]) => any
   enableDrag: boolean
 }
 
@@ -35,39 +33,63 @@ const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
   return <Droppable {...props}>{children}</Droppable>
 }
 
-export default function ItemList({ listId, items, refreshItems, error, isLoading, enableDrag }: ItemListProps) {
-  const [orderedItems, setOrderedItems] = useState<ItemType[]>(items || [])
+type ItemMap = {
+  [key: number]: ItemType
+}
 
-  useEffect(() => {
-    setOrderedItems(items || [])
-  }, [items?.map(item => item.order.toString() + item.name).join(",")])
+function getOrderedItems(items: ItemType[] | undefined, orderedItemIds: number[]): ItemType[] {
+  if (!items) {
+    return []
+  }
 
+  const itemMap = items.reduce((map, item) => {
+    map[item.id] = item
+    return map
+  }, {} as ItemMap)
+
+  return orderedItemIds.map(id => itemMap[id])
+}
+
+export default function ItemList({ listId, onItemsUpdate, enableDrag }: ItemListProps) {
+  const [orderedItemIds, setOrderedItemIds] = useState<number[]>([])
+
+  const {
+    data: items, error, isLoading, mutate: refreshItems
+  } = useSWR<ItemType[]>(
+    `/api/list/${listId}/item`,
+    createFetcherWithCallback<ItemType[]>(items => {
+      onItemsUpdate(items)
+      setOrderedItemIds(
+        items.sort((a, b) => a.order - b.order).map(item => item.id)
+      )
+    })
+  )
 
   if (error) return <div>Error loading list</div>
   if (isLoading) return <div>Loading...</div>
-  if (!orderedItems) return null
+  if (!items?.length) return null
+
+  const orderedItems = getOrderedItems(items, orderedItemIds)
 
   async function handleDragEnd(result: any) {
     const { destination, source } = result
 
-    if (!destination) {
-      return
-    }
+    if (!destination) return
+    if (destination.index === source.index) return
 
-    if (destination.index === source.index) {
-      return
-    }
-
-    let newItems = [...orderedItems]
-    newItems.splice(source.index, 1)
-    newItems.splice(destination.index, 0, orderedItems[source.index])
-    setOrderedItems(newItems)
+    setOrderedItemIds(orderedItemIds => {
+      let newItemIds = [...orderedItemIds]
+      newItemIds.splice(source.index, 1)
+      newItemIds.splice(destination.index, 0, orderedItemIds[source.index])
+      return newItemIds
+    })
 
     await reorderItem({ from: source.index + 1, to: destination.index + 1 })
+    refreshItems()
   }
 
   async function onDelete(id: number) {
-    setOrderedItems(items => items.filter(item => item.id !== id))
+    setOrderedItemIds(itemIds => itemIds.filter(itemId => itemId !== id))
     refreshItems()
   }
 

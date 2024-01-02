@@ -17,9 +17,7 @@ type ListPageProps = {
 
 export default function ListPage({ params: { id } }: ListPageProps) {
   const { data: list, error, isLoading, mutate: refreshList } = useSWR<List>(`/api/list/${id}`, fetcher)
-  const {
-    data: items, error: itemsError, isLoading: isLoadingItems, mutate: refreshItems
-  } = useSWR<Item[]>(`/api/list/${id}/item`, fetcher)
+  const [items, setItems] = useState<Item[] | null>(null)
   const [copied, setCopied] = useState(false)
   const [isReorderMode, setIsReorderMode] = useState(false)
 
@@ -99,10 +97,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
       <div className={isReorderMode ? 'item-list-reorder' : 'item-list-fixed'}>
         <ItemList
           listId={list.id}
-          items={items}
-          refreshItems={refreshItems}
-          error={itemsError}
-          isLoading={isLoadingItems}
+          onItemsUpdate={setItems}
           enableDrag={isReorderMode}
           />
       </div>
