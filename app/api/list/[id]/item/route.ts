@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/prisma'
 import { getUserId } from '@/util/auth'
+import { findOrderedItems } from '@/util/db'
 
 export async function GET(request: Request, { params: { id } }: { params: { id: string } }) {
   const userId = await getUserId()
@@ -19,7 +20,7 @@ export async function POST(request: Request, { params: { id } }: { params: { id:
     where: { userId },
     _max: { order: true },
   })
-  const result = await prisma.listItem.create({
+  await prisma.listItem.create({
     data: {
       list: {
         connect: {
@@ -39,5 +40,6 @@ export async function POST(request: Request, { params: { id } }: { params: { id:
       },
     },
   })
-  return NextResponse.json(result)
+  const items = await findOrderedItems(userId)
+  return NextResponse.json(items)
 }

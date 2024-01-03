@@ -10,7 +10,7 @@ type ItemProps = {
   item: ItemType
   selected: boolean
   index: number
-  onDelete: (items: ItemType[]) => any
+  onDelete: (id: number) => any
   enableDrag: boolean
 }
 
@@ -21,21 +21,14 @@ export default function Item({ item, listId, selected, index, onDelete, enableDr
   async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const data = { listId, itemId: item.id }
     const { checked } = event.target
-
-    if (checked) {
-      await addListItem(data)
-    } else {
-      await removeListItem(data)
-    }
-
+    checked ? addListItem(data) : removeListItem(data)
     setChecked(checked)
   }
 
   async function handleDelete() {
     setIsDeleting(true)
-    const items = await deleteItem(item.id)
+    onDelete(item.id)
     setIsDeleting(false)
-    onDelete(items)
   }
 
   return (
@@ -51,10 +44,10 @@ export default function Item({ item, listId, selected, index, onDelete, enableDr
               </div>
             </div>
             <div className="item-delete" style={{ display: "inline-block", verticalAlign: "middle" }}>
-              { isDeleting &&
+              { (item.isOptimistic || isDeleting) &&
                 <CircularProgress size="1.5rem" sx={{ position: "relative", top: "7px" }} />
               }
-              { !isDeleting &&
+              { !item.isOptimistic && !isDeleting &&
                 <DeleteForever
                   className="item-delete-button"
                   sx={{ color: 'grey', position: 'relative', top: 10 }}

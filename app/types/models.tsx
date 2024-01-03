@@ -1,9 +1,9 @@
 export type User = {
   id: number
   googleId: string
-  createdAd: string
-  lists: List[]
-  items: Item[]
+  createdAt: string
+  lists?: List[]
+  items?: Item[]
 }
 
 export type Item = {
@@ -12,8 +12,9 @@ export type Item = {
   order: number
   createdAt: string
   userId: number
-  user: User
-  lists: ListItem[]
+  user?: User
+  lists?: ListItem[]
+  isOptimistic?: boolean
 }
 
 export type List = {
@@ -21,13 +22,16 @@ export type List = {
   name: string
   createdAt: string
   userId: number
-  user: User
-  items: ListItem[]
+  user?: User
+  items?: ListItem[]
+  isOptimistic: boolean
 }
 
 export type ListItem = {
   id: number
   createdAt: string
-  list: List
-  item: Item
+  listId: number
+  list?: List
+  itemId: number
+  item?: Item
 }

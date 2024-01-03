@@ -16,11 +16,12 @@ export async function GET(request: Request, { params }: Params) {
 export async function PATCH(request: Request, { params }: Params) {
   const userId = await getUserId()
   const data = await request.json()
-  const result = await prisma.list.update({
+  await prisma.list.update({
     where: { id: parseInt(params.id), userId },
     data
   })
-  return NextResponse.json(result)
+  const lists = await findOrderedLists(userId)
+  return NextResponse.json(lists)
 }
 
 export async function DELETE(request: Request, { params }: Params) {

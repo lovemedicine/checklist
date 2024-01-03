@@ -9,15 +9,13 @@ import { List as ListType } from '@/types/models'
 
 type ListProps = {
   list: ListType
-  refreshLists: (lists?: ListType[]) => any
+  onUpdate: (id: number, name: string) => any
+  onDelete: (id: number) => any
 }
 
-export default function List({ list, refreshLists }: ListProps) {
+export default function List({ list, onUpdate, onDelete }: ListProps) {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isDeleted, setIsDeleted] = useState(false)
-
-  if (isDeleted) return null
 
   const timeFormatter = (value: number, unit: TimeAgo.Unit, suffix: TimeAgo.Suffix) => {
     if (unit === 'second') return 'just now';
@@ -27,9 +25,7 @@ export default function List({ list, refreshLists }: ListProps) {
 
   async function handleDelete(id: number) {
     setIsDeleting(true)
-    const lists = await deleteList(id)
-    setIsDeleted(true)
-    refreshLists(lists)
+    onDelete(id)
     setIsDeleting(false)
   }
 
@@ -37,8 +33,8 @@ export default function List({ list, refreshLists }: ListProps) {
     setIsEditMode(!isEditMode)
   }
 
-  async function onSave(updated: boolean) {
-    if (updated) await refreshLists()
+  async function onSave(id: number, name: string) {
+    onUpdate(id, name)
     setIsEditMode(false)
   }
 
@@ -68,10 +64,10 @@ export default function List({ list, refreshLists }: ListProps) {
             </Box>
           }
           <Box sx={{ pl: 1 }}>
-            { !isDeleting &&
+            { !list.isOptimistic && !isDeleting &&
               <DeleteForever sx={{ color: 'grey' }} onClick={() => handleDelete(list.id)} />
             }
-            { isDeleting &&
+            { (list.isOptimistic || isDeleting) &&
               <CircularProgress size="1.5rem" />
             }
           </Box>

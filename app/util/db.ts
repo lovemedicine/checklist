@@ -10,6 +10,7 @@ export async function findOrderedLists(userId: number) {
 export async function findOrderedItems(userId: number) {
   return await prisma.item.findMany({
     where: { userId },
-    orderBy: { order: 'asc' }
+    orderBy: { order: 'asc' },
+    include: { lists: true },
   })
 }

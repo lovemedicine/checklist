@@ -1,19 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { Checkbox, TextField, CircularProgress, Box } from '@mui/material'
-import { addItem } from '@/util/api'
-import { Item } from '@/types/models'
 
 type AddItemFormProps = {
   listId: number,
-  itemNames: string[],
-  onSubmit: (items: Item[]) => any
+  itemNames: string[]
+  onAdd: (id: string) => any
 }
 
 type NameMap = {
   [key: string]: boolean
 }
 
-export default function AddItemForm({ listId, itemNames, onSubmit }: AddItemFormProps) {
+export default function AddItemForm({ listId, itemNames, onAdd }: AddItemFormProps) {
   const [name, setName] = useState<string>("")
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(true)
@@ -43,8 +41,7 @@ export default function AddItemForm({ listId, itemNames, onSubmit }: AddItemForm
 
     if (trimmedName.length > 0) {
       setIsSaving(true)
-      const items = await addItem({ listId, name: trimmedName })
-      onSubmit(items)
+      onAdd(trimmedName)
       setName("")
       setIsSaving(false)
     }

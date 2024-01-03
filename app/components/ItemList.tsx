@@ -4,11 +4,32 @@ import { DragDropContext, Droppable, DroppableProps } from '@hello-pangea/dnd'
 import Item from '@/components/Item'
 import AddItemForm from '@/components/AddItemForm'
 import { Item as ItemType } from '@/types/models'
-import { reorderItem, createFetcherWithCallback } from '@/util/api'
+import { reorderItem, deleteItem, addItem, fetcher } from '@/util/api'
 
 type ItemListProps = {
   listId: number,
   enableDrag: boolean
+}
+
+function buildOptimisticItems(items: ItemType[], name: string, listId: number): ItemType[] {
+  const maxId = items.length ?  Math.max(...items.map(item => item.id)) : 0
+  const itemId = maxId + 1000000
+  const createdAt =  new Date().toJSON()
+  const itemCopy = items?.length ? items[0] : {
+    createdAt,
+    lists: [{ id: 999999, listId, itemId, name: 'dummy list', createdAt }],
+    userId: 9999999
+  }
+
+  const newItem = {
+    ...itemCopy,
+    id: itemId,
+    name,
+    order: Math.max(...(items || [0]).map(item => item.order)) + 1,
+    isOptimistic: true
+  }
+
+  return items.concat([newItem])
 }
 
 // taken from:
@@ -32,48 +53,16 @@ const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
   return <Droppable {...props}>{children}</Droppable>
 }
 
-type ItemMap = {
-  [key: number]: ItemType
-}
-
-function getSortedItemIds(items: ItemType[]): number[] {
-  return items.sort((a, b) => a.order - b.order).map(item => item.id)
-}
-
-function getOrderedItems(items: ItemType[] | undefined, orderedItemIds: number[]): ItemType[] {
-  if (!items?.length) {
-    return []
-  }
-
-  if (!orderedItemIds?.length) {
-    orderedItemIds = getSortedItemIds(items)
-  }
-
-  const itemMap = items.reduce((map, item) => {
-    map[item.id] = item
-    return map
-  }, {} as ItemMap)
-
-  return orderedItemIds.map(id => itemMap[id])
-}
-
 export default function ItemList({ listId, enableDrag }: ItemListProps) {
-  const [orderedItemIds, setOrderedItemIds] = useState<number[]>([])
-
   const {
     data: items, error, isLoading, mutate: refreshItems
-  } = useSWR<ItemType[]>(`/api/list/${listId}/item`,
-    createFetcherWithCallback<ItemType[]>(items => {
-      setOrderedItemIds(getSortedItemIds(items))
-    })
-  )
+  } = useSWR<ItemType[]>(`/api/list/${listId}/item`, fetcher)
 
   if (error) return <div>Error loading list</div>
   if (isLoading) return <div>Loading...</div>
+  if (!items?.length) return null
 
-  const orderedItems = getOrderedItems(items, orderedItemIds)
-
-  if (!orderedItems?.length) return null
+  const itemNames = items.map(item => item.name)
 
   async function handleDragEnd(result: any) {
     const { destination, source } = result
@@ -81,24 +70,20 @@ export default function ItemList({ listId, enableDrag }: ItemListProps) {
     if (!destination) return
     if (destination.index === source.index) return
 
-    setOrderedItemIds(orderedItemIds => {
-      let newItemIds = [...orderedItemIds]
-      newItemIds.splice(source.index, 1)
-      newItemIds.splice(destination.index, 0, orderedItemIds[source.index])
-      return newItemIds
-    })
-
-    const items = await reorderItem({ from: source.index + 1, to: destination.index + 1 })
-    refreshItems(items)
+    let newItems = [...items as ItemType[]]
+    newItems.splice(source.index, 1)
+    newItems.splice(destination.index, 0, (items as ItemType[])[source.index])
+    refreshItems(reorderItem({ from: source.index + 1, to: destination.index + 1 }), { optimisticData: newItems })
   }
 
-  function onDelete(items: ItemType[]) {
-    setOrderedItemIds(items.map(item => item.id))
-    refreshItems(items)
+  function onDelete(itemId: number) {
+    const optimisticData = (items as ItemType[]).filter(item => item.id !== itemId)
+    refreshItems(deleteItem(itemId), { optimisticData })
   }
 
-  function onAddItemFormSubmit(items: ItemType[]) {
-    refreshItems(items)
+  function onAdd(name: string) {
+    const optimisticData = buildOptimisticItems(items || [], name, listId)
+    refreshItems(addItem({ listId, name }), { optimisticData })
   }
 
   return (
@@ -107,12 +92,13 @@ export default function ItemList({ listId, enableDrag }: ItemListProps) {
         <StrictModeDroppable droppableId={`droppable-${listId}`}>
           { provided => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
-              { orderedItems.map((item, index) => (
+              { items.map((item, index) => (
                 <Item
                   key={item.id}
                   listId={listId}
                   item={item}
-                  selected={item.lists.length > 0} index={index}
+                  selected={!!item.lists?.some(listItem => listItem.listId === listId)}
+                  index={index}
                   onDelete={onDelete}
                   enableDrag={enableDrag}
                   />
@@ -125,8 +111,8 @@ export default function ItemList({ listId, enableDrag }: ItemListProps) {
 
       <AddItemForm
         listId={listId}
-        itemNames={orderedItems.map(item => item.name)}
-        onSubmit={onAddItemFormSubmit}
+        itemNames={itemNames}
+        onAdd={onAdd}
         />
     </>
   )

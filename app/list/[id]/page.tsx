@@ -48,9 +48,11 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   }
 
   function handleCopySelected(event: React.MouseEvent<HTMLButtonElement>) {
-    const itemsText = items?.filter(item => item.lists.length > 0).map(item => item.name).join("\n")
+    const itemsText = items?.filter(item => {
+      return item.lists?.some(list => list.id === parseInt(id))
+    }).map(item => item.name).join("\n")
 
-    if (itemsText) {
+    if (itemsText?.length) {
       navigator.clipboard.writeText(itemsText)
       setCopied(true)
     }
