@@ -1,14 +1,12 @@
-# Checklist App
+# Checklists
 
-An app built with Next.js and Prisma for creating reusable checklists.
-
+A pratice Next.js app for creating reusable checklists. View the [demo](https://checklist-gold.vercel.app).
 
 ## Requirements
 
 - npm
 - nodejs
 - postgres
-
 
 ## Getting Started
 
