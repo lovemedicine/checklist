@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { Box, Card, CardContent, Typography, IconButton, CircularProgress } from '@mui/material'
 import { DeleteForever, Edit } from '@mui/icons-material'
 import EditList from '@/components/EditList'
-import { deleteList } from '@/util/api'
 import { List as ListType } from '@/types/models'
+import { slugify } from '@/util/routes'
 
 type ListProps = {
   list: ListType
@@ -48,7 +48,7 @@ export default function List({ list, onUpdate, onDelete }: ListProps) {
           { !isEditMode &&
             <Box sx={{ display: "flex", height: "40px" }}>
               <Typography variant="h5" sx={{ mt: 0.5 }}>
-                <Link href={`/list/${list.id}`}>
+                <Link href={`/list/${list.id}/${slugify(list.name)}`}>
                   {list.name}
                 </Link>
               </Typography>
