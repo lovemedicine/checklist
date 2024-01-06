@@ -1,4 +1,8 @@
-html > body > div > div, h3, h4, h5, * {
+html > body > div > div,
+h3,
+h4,
+h5,
+* {
   font-family: monospace;
 }
 
@@ -12,7 +16,6 @@ a {
 }
 
 @media only screen and (max-device-width: 480px) {
-
   .item {
     display: inline-block;
   }
@@ -24,7 +27,6 @@ a {
 }
 
 @media only screen and (min-device-width: 480px) {
-
   .item .item-delete-button {
     display: none;
   }
@@ -43,7 +45,6 @@ a {
 }
 
 @media only screen and (min-device-width: 720px) {
-
   .item-list-fixed {
     column-width: 210px;
     column-gap: 20px;

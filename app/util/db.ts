@@ -1,16 +1,16 @@
-import prisma from '@/prisma'
+import prisma from "@/prisma";
 
 export async function findOrderedLists(userId: number) {
   return await prisma.list.findMany({
     where: { userId },
-    orderBy: { id: 'desc' }
-  })
+    orderBy: { id: "desc" },
+  });
 }
 
 export async function findOrderedItems(userId: number) {
   return await prisma.item.findMany({
     where: { userId },
-    orderBy: { order: 'asc' },
+    orderBy: { order: "asc" },
     include: { lists: true },
-  })
+  });
 }

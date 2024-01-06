@@ -1,7 +1,7 @@
 type ConfigType = {
-  singleUserId: number
-}
+  singleUserId: number;
+};
 
 export default {
-  singleUserId: 1
-} as ConfigType
+  singleUserId: 1,
+} as ConfigType;
