@@ -12,10 +12,4 @@ const { handleRequest } = createYoga<{
   fetchAPI: { Response }
 })
 
-export const config = {
-  api: {
-    bodyParser: false
-  }
-}
-
 export { handleRequest as GET, handleRequest as POST, handleRequest as OPTIONS }
