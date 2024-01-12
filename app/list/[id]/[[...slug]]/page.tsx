@@ -4,15 +4,13 @@ import { useState, useEffect } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { Typography, Button, Grid, Box } from "@mui/material";
-import { ContentCopy, Reorder, CheckCircleOutlined } from "@mui/icons-material";
+import { ContentCopy } from "@mui/icons-material";
 import ItemList from "@/components/ItemList";
 import { List, Item } from "@/types/models";
 import { fetcher } from "@/util/api";
 
 type ListPageProps = {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 };
 
 export default function ListPage({ params: { id } }: ListPageProps) {
@@ -24,7 +22,6 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   } = useSWR<List>(`/api/list/${id}`, fetcher);
   const { data: items } = useSWR<Item[]>(`/api/list/${id}/item`, fetcher);
   const [copied, setCopied] = useState(false);
-  const [isReorderMode, setIsReorderMode] = useState(false);
 
   useEffect(() => {
     if (copied) {
@@ -65,10 +62,6 @@ export default function ListPage({ params: { id } }: ListPageProps) {
     }
   }
 
-  function handleToggleReorderMode() {
-    setIsReorderMode(!isReorderMode);
-  }
-
   return (
     <>
       <Box sx={{ mb: 1 }}>
@@ -81,16 +74,6 @@ export default function ListPage({ params: { id } }: ListPageProps) {
       </Box>
       <Grid container sx={{ mb: 2 }}>
         <Grid item>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={isReorderMode ? <CheckCircleOutlined /> : <Reorder />}
-            onClick={handleToggleReorderMode}
-          >
-            {isReorderMode ? "Finish Reorder" : "Reorder"}
-          </Button>
-        </Grid>
-        <Grid item sx={{ ml: 2 }}>
           <Button
             variant="outlined"
             size="small"
@@ -115,9 +98,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
         </Grid>
       </Grid>
 
-      <div className={isReorderMode ? "item-list-reorder" : "item-list-fixed"}>
-        <ItemList listId={list.id} enableDrag={isReorderMode} />
-      </div>
+      <ItemList listId={list.id} />
     </>
   );
 }

@@ -49,10 +49,10 @@ a {
 }
 
 @media only screen and (min-device-width: 720px) {
-  .item-list-fixed {
+  .item-list {
     column-width: 210px;
     column-gap: 20px;
     column-fill: auto;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 140px);
   }
 }
