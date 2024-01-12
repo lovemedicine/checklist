@@ -1,8 +1,8 @@
 import { useState, forwardRef } from "react";
-import { Checkbox, CircularProgress, styled } from "@mui/material";
+import { Checkbox, CircularProgress } from "@mui/material";
 import { DeleteForever } from "@mui/icons-material";
 import { Item as ItemType } from "@/types/models";
-import { addListItem, removeListItem, deleteItem } from "@/util/api";
+import { addListItem, removeListItem } from "@/util/api";
 
 export type ItemProps = {
   listId: number;
@@ -38,7 +38,11 @@ export default forwardRef(function Item(
           sx={{ padding: "5px" }}
         />
         &nbsp;
-        <div className="item-name" style={{ cursor: "grab " }} {...listeners}>
+        <div
+          className="item-name"
+          style={{ cursor: "grab", touchAction: "none" }}
+          {...listeners}
+        >
           {item.name}
         </div>
       </div>
@@ -55,7 +59,7 @@ export default forwardRef(function Item(
         {!item.isOptimistic && !isDeleting && onDelete && (
           <DeleteForever
             className="item-delete-button"
-            sx={{ color: "grey", position: "relative", top: 10 }}
+            sx={{ color: "grey", position: "relative", top: 5 }}
             onClick={handleDelete}
           />
         )}
