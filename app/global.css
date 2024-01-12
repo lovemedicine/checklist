@@ -10,6 +10,10 @@ a {
   text-decoration: none !important;
 }
 
+.item-list.item-list-dragging .item .item-delete-button {
+  display: none;
+}
+
 .item .item-name {
   display: inline-block;
   vertical-align: middle;

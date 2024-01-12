@@ -4,12 +4,7 @@ import { useState, useEffect } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { Typography, Button, Grid, Box } from "@mui/material";
-import {
-  ContentCopy,
-  Reorder,
-  CheckCircleOutlined,
-  ChevronLeft,
-} from "@mui/icons-material";
+import { ContentCopy, Reorder, CheckCircleOutlined } from "@mui/icons-material";
 import ItemList from "@/components/ItemList";
 import { List, Item } from "@/types/models";
 import { fetcher } from "@/util/api";
@@ -59,7 +54,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   function handleCopySelected(event: React.MouseEvent<HTMLButtonElement>) {
     const itemsText = items
       ?.filter((item) => {
-        return item.lists?.some((list) => list.id === parseInt(id));
+        return item.lists?.some((list) => list.listId === parseInt(id));
       })
       .map((item) => item.name)
       .join("\n");
