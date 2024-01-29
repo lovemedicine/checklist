@@ -1,63 +1,82 @@
-import { useState } from 'react'
-import { Draggable } from '@hello-pangea/dnd'
-import { Checkbox, CircularProgress } from '@mui/material'
-import { DeleteForever } from '@mui/icons-material'
-import { Item as ItemType } from '@/types/models'
-import { addListItem, removeListItem, deleteItem } from '@/util/api'
+import { useState, forwardRef } from "react";
+import { Checkbox, CircularProgress } from "@mui/material";
+import { DeleteForever } from "@mui/icons-material";
+import { Item as ItemType } from "@/types/models";
+import { addListItem, removeListItem } from "@/util/api";
 
-type ItemProps = {
-  listId: number
-  item: ItemType
-  selected: boolean
-  index: number
-  onDelete: (id: number) => any
-  enableDrag: boolean
-}
+export type ItemProps = {
+  listId: number;
+  item: ItemType;
+  selected: boolean;
+  onDelete?: (id: number) => any;
+  isDragging: boolean;
+  listeners?: any;
+  style?: {
+    transform: string | undefined;
+    transition: string | undefined;
+  };
+};
 
-export default function Item({ item, listId, selected, index, onDelete, enableDrag }: ItemProps) {
-  const [checked, setChecked] = useState(selected)
-  const [isDeleting, setIsDeleting] = useState(false)
+export default forwardRef(function Item(
+  { item, listId, selected, onDelete, style, listeners, ...props }: ItemProps,
+  ref: any
+) {
+  const [checked, setChecked] = useState(selected);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  return (
+    <div
+      ref={ref}
+      className="item"
+      style={{ display: "flex", justifyContent: "space-between", ...style }}
+      {...props}
+    >
+      <div>
+        <Checkbox
+          checked={checked}
+          onChange={handleChange}
+          sx={{ padding: "5px" }}
+        />
+        &nbsp;
+        <div
+          className="item-name"
+          style={{ cursor: "grab", touchAction: "none" }}
+          {...listeners}
+        >
+          {item.name}
+        </div>
+      </div>
+      <div
+        className="item-delete"
+        style={{ display: "inline-block", verticalAlign: "middle" }}
+      >
+        {(item.isOptimistic || isDeleting) && (
+          <CircularProgress
+            size="1.5rem"
+            sx={{ position: "relative", top: "7px" }}
+          />
+        )}
+        {!item.isOptimistic && !isDeleting && onDelete && (
+          <DeleteForever
+            className="item-delete-button"
+            sx={{ color: "grey", position: "relative", top: 5 }}
+            onClick={handleDelete}
+          />
+        )}
+      </div>
+    </div>
+  );
 
   async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const data = { listId, itemId: item.id }
-    const { checked } = event.target
-    checked ? addListItem(data) : removeListItem(data)
-    setChecked(checked)
+    const data = { listId, itemId: item.id };
+    const { checked } = event.target;
+    checked ? addListItem(data) : removeListItem(data);
+    setChecked(checked);
   }
 
   async function handleDelete() {
-    setIsDeleting(true)
-    onDelete(item.id)
-    setIsDeleting(false)
+    setIsDeleting(true);
+    onDelete ? onDelete(item.id) : null;
+    setIsDeleting(false);
   }
-
-  return (
-    <Draggable draggableId={`draggable-${item.id}`} index={index} isDragDisabled={!enableDrag}>
-      { provided => (
-        <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-          <div className="item" style={{ display: "flex", justifyContent: "space-between" }}>
-            <div>
-              <Checkbox checked={checked} onChange={handleChange} sx={{ padding: '5px' }} />
-              &nbsp;
-              <div className="item-name">
-                {item.name}
-              </div>
-            </div>
-            <div className="item-delete" style={{ display: "inline-block", verticalAlign: "middle" }}>
-              { (item.isOptimistic || isDeleting) &&
-                <CircularProgress size="1.5rem" sx={{ position: "relative", top: "7px" }} />
-              }
-              { !item.isOptimistic && !isDeleting &&
-                <DeleteForever
-                  className="item-delete-button"
-                  sx={{ color: 'grey', position: 'relative', top: 10 }}
-                  onClick={handleDelete}
-                  />
-              }
-            </div>
-          </div>
-        </div>
-      )}
-    </Draggable>
-  )
-}
+});
