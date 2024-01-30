@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import prisma from "@/prisma";
 import { getUserId } from "@/util/auth";
 import { findOrderedItems } from "@/util/db";
@@ -18,9 +19,21 @@ export async function POST(request: Request) {
   return NextResponse.json(items);
 }
 
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: number } }
+) {
+  const { id } = params;
+  const result = await prisma.listItem.delete({
+    where: { id },
+  });
+  revalidatePath("/item");
+  return NextResponse.json(result);
+}
+
 function getUpsAndDowns(
   from: number,
-  to: number,
+  to: number
 ): { ups?: number[] | undefined; downs?: number[] } {
   const range = (start: number, stop: number) =>
     Array.from({ length: stop - start + 1 }, (_, i) => start + i);

@@ -1,20 +1,11 @@
+import { Item } from "@/types/models";
+
 export async function fetcher(
   input: RequestInfo | URL,
-  init?: RequestInit | undefined,
+  init?: RequestInit | undefined
 ): Promise<any> {
   const result = await fetch(input, init);
   return await result.json();
-}
-
-export function createFetcherWithCallback<T>(callback: (data: T) => any) {
-  return async function (
-    input: RequestInfo | URL,
-    init?: RequestInit | undefined,
-  ): Promise<T> {
-    const data = await fetcher(input, init);
-    callback(data);
-    return data;
-  };
 }
 
 export async function addList(list: { name: string }) {

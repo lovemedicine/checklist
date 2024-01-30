@@ -1,6 +1,6 @@
 import GoogleProvider from "next-auth/providers/google";
 import { getServerSession } from "next-auth/next";
-import type { Session, NextAuthOptions } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import prisma from "@/prisma";
 import config from "@/config";
 
