@@ -28,3 +28,4 @@ builder.queryType({
 });
 
 builder.addScalarType("Date", DateTimeResolver, {});
+builder.mutationType({});
