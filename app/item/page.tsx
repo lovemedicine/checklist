@@ -4,7 +4,7 @@ import { findOrderedItems } from "@/util/db";
 import DeleteItemButton from "@/components/DeleteItemButton";
 import { getUserId } from "@/util/auth";
 
-export async function getItems() {
+async function getItems() {
   const userId = await getUserId();
   return await findOrderedItems(userId);
 }
