@@ -43,7 +43,6 @@ export default function ItemList({ listId }: ItemListProps) {
               item={item}
               selected={isSelected(item)}
               onDelete={onDelete}
-              isDragging={item.id === activeItem?.id}
             />
           ))}
         </SortableContext>
@@ -54,7 +53,6 @@ export default function ItemList({ listId }: ItemListProps) {
 
   function handleDragStart(event: any) {
     const id = event.active.id;
-    console.log("drag start with item", id);
     const item = items?.find((item) => item.id == id);
     setActiveItem(item || null);
   }

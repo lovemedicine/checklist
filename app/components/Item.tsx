@@ -9,7 +9,6 @@ export type ItemProps = {
   item: ItemType;
   selected: boolean;
   onDelete?: (id: number) => any;
-  isDragging: boolean;
   listeners?: any;
   style?: {
     transform: string | undefined;
@@ -40,7 +39,10 @@ export default forwardRef(function Item(
         &nbsp;
         <div
           className="item-name"
-          style={{ cursor: "grab", touchAction: "none" }}
+          style={{
+            cursor: item.isOptimistic ? "default" : "grab",
+            touchAction: "none",
+          }}
           {...listeners}
         >
           {item.name}
