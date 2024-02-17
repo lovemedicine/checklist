@@ -4,7 +4,7 @@ import Item, { ItemProps } from "@/components/Item";
 
 export default function SortableItem(props: ItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: props.item.id, disabled: !!props.item.isOptimistic });
+    useSortable({ id: props.item.id, disabled: !props.dragEnabled });
 
   const style = {
     transform: CSS.Transform.toString(transform),

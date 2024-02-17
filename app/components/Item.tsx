@@ -8,6 +8,7 @@ export type ItemProps = {
   listId: number;
   item: ItemType;
   selected: boolean;
+  dragEnabled: boolean;
   onDelete?: (id: number) => any;
   listeners?: any;
   style?: {
@@ -17,7 +18,16 @@ export type ItemProps = {
 };
 
 export default forwardRef(function Item(
-  { item, listId, selected, onDelete, style, listeners, ...props }: ItemProps,
+  {
+    item,
+    listId,
+    selected,
+    dragEnabled,
+    onDelete,
+    style,
+    listeners,
+    ...props
+  }: ItemProps,
   ref: any
 ) {
   const [checked, setChecked] = useState(selected);
@@ -40,7 +50,7 @@ export default forwardRef(function Item(
         <div
           className="item-name"
           style={{
-            cursor: item.isOptimistic ? "default" : "grab",
+            cursor: dragEnabled ? "grab" : "auto",
             touchAction: "none",
           }}
           {...listeners}

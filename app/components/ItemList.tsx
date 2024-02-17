@@ -12,14 +12,15 @@ type ItemListProps = {
 };
 
 export default function ItemList({ listId }: ItemListProps) {
+  const [dragEnabled, setDragEnabled] = useState(true);
+  const [activeItem, setActiveItem] = useState<Item | null>(null);
+
   const {
     data: items,
     error,
     isLoading,
     mutate: refreshItems,
   } = useSWR<Item[]>(`/api/list/${listId}/item`, fetcher);
-
-  const [activeItem, setActiveItem] = useState<Item | null>(null);
 
   if (error) return <div>Error loading list</div>;
   if (isLoading) return <div>Loading...</div>;
@@ -43,6 +44,7 @@ export default function ItemList({ listId }: ItemListProps) {
               item={item}
               selected={isSelected(item)}
               onDelete={onDelete}
+              dragEnabled={dragEnabled && !item.isOptimistic}
             />
           ))}
         </SortableContext>
@@ -65,9 +67,16 @@ export default function ItemList({ listId }: ItemListProps) {
       const newIndex = items.findIndex((item) => item.id === over.id);
       const newItems = arrayMove(items, oldIndex, newIndex);
 
-      refreshItems(reorderItem({ from: oldIndex + 1, to: newIndex + 1 }), {
-        optimisticData: newItems,
-      });
+      setDragEnabled(false);
+
+      await refreshItems(
+        reorderItem({ from: oldIndex + 1, to: newIndex + 1 }),
+        {
+          optimisticData: newItems,
+        }
+      );
+
+      setDragEnabled(true);
     }
 
     setActiveItem(null);
