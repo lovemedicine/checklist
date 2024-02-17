@@ -26,7 +26,7 @@ export default async function ItemPage() {
       </Box>
       {items.map((item) => (
         <Box key={item.id} sx={{ p: 1 }}>
-          <DeleteItemButton id={item.id} />
+          <DeleteItemButton id={item.id} listId={item.listId} />
           &nbsp;
           {item.name}
         </Box>

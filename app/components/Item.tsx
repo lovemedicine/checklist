@@ -2,7 +2,7 @@ import { useState, forwardRef } from "react";
 import { Checkbox, CircularProgress } from "@mui/material";
 import { DeleteForever } from "@mui/icons-material";
 import { Item as ItemType } from "@/types/models";
-import { addListItem, removeListItem } from "@/util/api";
+import { updateList, updateListItem } from "@/util/api";
 
 export type ItemProps = {
   listId: number;
@@ -80,9 +80,9 @@ export default forwardRef(function Item(
   );
 
   async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const data = { listId, itemId: item.id };
     const { checked } = event.target;
-    checked ? addListItem(data) : removeListItem(data);
+    const data = { listId, itemId: item.id, checked };
+    updateListItem(data);
     setChecked(checked);
   }
 

@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  seed = "prisma/seed.ts"
 }
 
 datasource db {
@@ -16,7 +17,6 @@ model User {
   googleId    String?     @unique
   createdAt   DateTime    @default(now())
   lists       List[]
-  items       Item[]
 }
 
 model Item {
@@ -24,12 +24,11 @@ model Item {
   name        String
   order       Int
   createdAt   DateTime    @default(now())
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
-  lists       ListItem[]
+  checked     Boolean     @default(true)
+  listId      Int
+  list        List        @relation(fields: [listId], references: [id], onDelete: Cascade)
 
-  @@unique([name, userId])
-  @@unique([order, userId])
+  @@unique([order, listId])
 }
 
 model List {
@@ -39,16 +38,5 @@ model List {
   createdAt   DateTime    @default(now())
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
-  items       ListItem[]
-}
-
-model ListItem {
-  id          Int         @id @default(autoincrement())
-  createdAt   DateTime    @default(now())
-  list        List        @relation(fields: [listId], references: [id], onDelete: Cascade)
-  listId      Int
-  item        Item        @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  itemId      Int
-
-  @@unique([listId, itemId])
+  items       Item[]
 }

@@ -50,9 +50,7 @@ export default function ListPage({ params: { id } }: ListPageProps) {
 
   function handleCopySelected(event: React.MouseEvent<HTMLButtonElement>) {
     const itemsText = items
-      ?.filter((item) => {
-        return item.lists?.some((list) => list.listId === parseInt(id));
-      })
+      ?.filter((item) => item.checked)
       .map((item) => item.name)
       .join("\n");
 
