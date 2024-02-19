@@ -3,22 +3,12 @@ import { Checkbox, TextField, CircularProgress, Box } from "@mui/material";
 
 type AddItemFormProps = {
   listId: number;
-  itemNames: string[];
   onAdd: (id: string) => any;
 };
 
-type NameMap = {
-  [key: string]: boolean;
-};
-
-export default function AddItemForm({
-  listId,
-  itemNames,
-  onAdd,
-}: AddItemFormProps) {
+export default function AddItemForm({ listId, onAdd }: AddItemFormProps) {
   const [name, setName] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
-  const [isValid, setIsValid] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -27,21 +17,9 @@ export default function AddItemForm({
     }
   }, [isSaving]);
 
-  const nameMap = itemNames.reduce((map, name) => {
-    map[name] = true;
-    return map;
-  }, {} as NameMap);
-
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    let trimmedName = name.trim();
-
-    if (nameMap[trimmedName]) {
-      setIsValid(false);
-      return;
-    } else {
-      setIsValid(true);
-    }
+    const trimmedName = name.trim();
 
     if (trimmedName.length > 0) {
       setIsSaving(true);
@@ -64,8 +42,6 @@ export default function AddItemForm({
         value={name}
         autoComplete="off"
         disabled={isSaving}
-        error={!isValid}
-        helperText={isValid ? "" : "Item already exists"}
         inputRef={inputRef}
       />
       <Box sx={{ display: "inline-block", ml: 1 }}>

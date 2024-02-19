@@ -4,11 +4,17 @@ import { useRouter } from "next/navigation";
 import { DeleteForever } from "@mui/icons-material";
 import { deleteItem } from "@/util/api";
 
-export default function DeleteItemButton({ id }: { id: number }) {
+export default function DeleteItemButton({
+  id,
+  listId,
+}: {
+  id: number;
+  listId: number;
+}) {
   const router = useRouter();
 
   async function handleDelete() {
-    await deleteItem(id);
+    await deleteItem({ id, listId });
     router.refresh();
   }
 

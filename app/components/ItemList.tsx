@@ -24,9 +24,7 @@ export default function ItemList({ listId }: ItemListProps) {
 
   if (error) return <div>Error loading list</div>;
   if (isLoading) return <div>Loading...</div>;
-  if (!items?.length) return null;
-
-  const itemNames = items.map((item) => item.name);
+  if (!items) return null;
 
   return (
     <div className={`item-list${activeItem ? " item-list-dragging" : ""}`}>
@@ -42,14 +40,14 @@ export default function ItemList({ listId }: ItemListProps) {
               key={item.id}
               listId={listId}
               item={item}
-              selected={isSelected(item)}
+              selected={item.checked}
               onDelete={onDelete}
               dragEnabled={dragEnabled && !item.isOptimistic}
             />
           ))}
         </SortableContext>
       </DndContext>
-      <AddItemForm listId={listId} itemNames={itemNames} onAdd={onAdd} />
+      <AddItemForm listId={listId} onAdd={onAdd} />
     </div>
   );
 
@@ -70,7 +68,7 @@ export default function ItemList({ listId }: ItemListProps) {
       setDragEnabled(false);
 
       await refreshItems(
-        reorderItem({ from: oldIndex + 1, to: newIndex + 1 }),
+        reorderItem({ listId, from: oldIndex + 1, to: newIndex + 1 }),
         {
           optimisticData: newItems,
         }
@@ -90,16 +88,12 @@ export default function ItemList({ listId }: ItemListProps) {
     const optimisticData = (items as Item[]).filter(
       (item) => item.id !== itemId
     );
-    refreshItems(deleteItem(itemId), { optimisticData });
+    refreshItems(deleteItem({ id: itemId, listId }), { optimisticData });
   }
 
   function onAdd(name: string) {
     const optimisticData = buildOptimisticItems(items || [], name, listId);
     refreshItems(addItem({ listId, name }), { optimisticData });
-  }
-
-  function isSelected(item: Item): boolean {
-    return !!item.lists?.some((listItem) => listItem.listId === listId);
   }
 }
 
@@ -115,8 +109,6 @@ function buildOptimisticItems(
     ? items[0]
     : {
         createdAt,
-        lists: [{ id: 999999, listId, itemId, createdAt }],
-        userId: 9999999,
       };
 
   const newItem = {
@@ -124,6 +116,8 @@ function buildOptimisticItems(
     id: itemId,
     name,
     order: Math.max(...(items || [0]).map((item) => item.order)) + 1,
+    checked: true,
+    listId,
     isOptimistic: true,
   };
 

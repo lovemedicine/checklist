@@ -1,5 +1,3 @@
-import { Item } from "@/types/models";
-
 export async function fetcher(
   input: RequestInfo | URL,
   init?: RequestInit | undefined
@@ -48,34 +46,32 @@ export async function addItem({
   return await response.json();
 }
 
-export async function addListItem({
+export async function updateListItem({
   listId,
   itemId,
+  checked,
 }: {
   listId: number;
   itemId: number;
+  checked: boolean;
 }) {
   const response = await fetch(`/api/list/${listId}/item/${itemId}`, {
     method: "PUT",
+    body: JSON.stringify({ checked }),
   });
   return response.json();
 }
 
-export async function removeListItem({
+export async function reorderItem({
   listId,
-  itemId,
+  from,
+  to,
 }: {
   listId: number;
-  itemId: number;
+  from: number;
+  to: number;
 }) {
-  const response = await fetch(`/api/list/${listId}/item/${itemId}`, {
-    method: "DELETE",
-  });
-  return response.json();
-}
-
-export async function reorderItem({ from, to }: { from: number; to: number }) {
-  const response = await fetch(`/api/item`, {
+  const response = await fetch(`/api/list/${listId}/item`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ from, to }),
@@ -83,8 +79,14 @@ export async function reorderItem({ from, to }: { from: number; to: number }) {
   return response.json();
 }
 
-export async function deleteItem(id: number) {
-  const response = await fetch(`/api/item/${id}`, {
+export async function deleteItem({
+  id,
+  listId,
+}: {
+  id: number;
+  listId: number;
+}) {
+  const response = await fetch(`/api/list/${listId}/item/${id}`, {
     method: "DELETE",
   });
   return response.json();

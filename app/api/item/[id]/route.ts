@@ -5,13 +5,13 @@ import { findOrderedItems } from "@/util/db";
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   const userId = await getUserId();
   const result = await prisma.item.findUnique({
     where: {
       id: parseInt(params.id),
-      userId,
+      list: { userId },
     },
     select: {
       order: true,
@@ -26,12 +26,12 @@ export async function DELETE(
     await prisma.item.delete({
       where: {
         id: parseInt(params.id),
-        userId,
+        list: { userId },
       },
     });
 
     await tx.item.updateMany({
-      where: { order: { gt: result.order }, userId },
+      where: { order: { gt: result.order }, list: { userId } },
       data: { order: { decrement: 1 } },
     });
   });
