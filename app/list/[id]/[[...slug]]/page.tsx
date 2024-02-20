@@ -63,7 +63,9 @@ export default function ListPage({ params: { id } }: ListPageProps) {
   return (
     <>
       <Box sx={{ mb: 1 }}>
-        <Link href="/">&laquo; All lists</Link>
+        <Link className="no-underline" href="/">
+          &laquo; All lists
+        </Link>
       </Box>
       <Box className="list-name" sx={{ mb: 1 }}>
         <Typography variant="h3" sx={{ fontFamily: "monospace" }}>
