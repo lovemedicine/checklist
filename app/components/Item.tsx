@@ -10,6 +10,7 @@ export type ItemProps = {
   selected: boolean;
   dragEnabled: boolean;
   onDelete?: (id: number) => any;
+  onSelectedChange: () => void;
   listeners?: any;
   style?: {
     transform: string | undefined;
@@ -24,6 +25,7 @@ export default forwardRef(function Item(
     selected,
     dragEnabled,
     onDelete,
+    onSelectedChange,
     style,
     listeners,
     ...props
@@ -84,6 +86,7 @@ export default forwardRef(function Item(
     const data = { listId, itemId: item.id, checked };
     updateListItem(data);
     setChecked(checked);
+    onSelectedChange();
   }
 
   async function handleDelete() {

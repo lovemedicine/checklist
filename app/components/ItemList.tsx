@@ -42,6 +42,7 @@ export default function ItemList({ listId }: ItemListProps) {
               item={item}
               selected={item.checked}
               onDelete={onDelete}
+              onSelectedChange={refreshItems}
               dragEnabled={dragEnabled && !item.isOptimistic}
             />
           ))}

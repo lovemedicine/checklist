@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import prisma from "@/prisma";
 import { getUserId } from "@/util/auth";
-import { findOrderedItems } from "@/util/db";
+import { findOrderedItems, updateListItemOrdersInTransaction } from "@/util/db";
 
 export async function GET(
   request: Request,
@@ -65,91 +66,102 @@ export async function PUT(
   request: Request,
   { params: { id } }: { params: { id: string } }
 ) {
+  const listId = parseInt(id);
   const userId = await getUserId();
   const { from, to } = await request.json();
   const { ups, downs } = getUpsAndDowns(from, to);
 
-  await prisma.$transaction(async (tx) => {
-    await tx.item.update({
-      where: {
-        order_listId: { order: from, listId: parseInt(id) },
-        list: { userId },
-      },
-      data: { order: -1 },
-    });
-
-    if (ups) {
-      // sqlite will throw unique constraint error if values are incremented directly.
-      // instead we have to raise them above the current max order then lower them to
-      // the value we intended to increment to.
-      // see: https://stackoverflow.com/questions/7703196/sqlite-increment-unique-integer-field
-
-      const {
-        _max: { order: maxOrder },
-      } = await prisma.item.aggregate({
-        where: { listId: parseInt(id), list: { userId } },
-        _max: { order: true },
-      });
-
-      const diff = (maxOrder as number) - Math.min(...ups);
-
-      await tx.item.updateMany({
-        where: { order: { in: ups }, listId: parseInt(id), list: { userId } },
-        data: { order: { increment: diff + 1 } },
-      });
-
-      const newUps = ups.map((order) => order + diff + 1);
-
-      await tx.item.updateMany({
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.item.update({
         where: {
-          order: { in: newUps },
-          listId: parseInt(id),
+          order_listId: { order: from, listId },
           list: { userId },
         },
-        data: { order: { decrement: diff } },
-      });
-    }
-
-    if (downs) {
-      // sqlite will throw unique constraint error if values are decremented directly.
-      // instead we have to raise them above the current max order then lower them to
-      // the value we intended to increment to.
-      // see: https://stackoverflow.com/questions/7703196/sqlite-increment-unique-integer-field
-
-      const {
-        _max: { order: maxOrder },
-      } = await prisma.item.aggregate({
-        where: { listId: parseInt(id), list: { userId } },
-        _max: { order: true },
+        data: { order: -1 },
       });
 
-      const diff = (maxOrder as number) - Math.min(...downs);
+      if (ups) {
+        // postgres will throw unique constraint error if values are incremented directly.
+        // instead we have to raise them above the current max order then lower them to
+        // the value we intended to increment to.
+        // see: https://stackoverflow.com/questions/7703196/sqlite-increment-unique-integer-field
 
-      await tx.item.updateMany({
-        where: { order: { in: downs }, listId: parseInt(id), list: { userId } },
-        data: { order: { increment: diff + 1 } },
-      });
+        // for some reason when attempting to use updateListItemOrdersInTransaction it produces
+        // a unique constraint violation. haven't been able to determine why. perhaps something
+        // to do with inconsistencies in the transaction, or with transaction isolation levels,
+        // which can be specified in prisma.
+        //
+        // updateListItemOrdersInTransaction(tx, listId, userId, ups, "increment");
 
-      const newDowns = downs.map((order) => order + diff + 1);
+        const {
+          _max: { order: maxOrder },
+        } = await prisma.item.aggregate({
+          where: { listId, list: { userId } },
+          _max: { order: true },
+        });
 
-      await tx.item.updateMany({
+        const diff = (maxOrder as number) - Math.min(...ups);
+
+        await tx.item.updateMany({
+          where: { order: { in: ups }, listId, list: { userId } },
+          data: { order: { increment: diff + 1 } },
+        });
+
+        const newUps = ups.map((order) => order + diff + 1);
+
+        await tx.item.updateMany({
+          where: {
+            order: { in: newUps },
+            listId,
+            list: { userId },
+          },
+          data: { order: { decrement: diff } },
+        });
+      }
+
+      if (downs) {
+        // postgres will throw unique constraint error if values are decremented directly.
+        // instead we have to raise them above the current max order then lower them to
+        // the value we intended to increment to.
+        // see: https://stackoverflow.com/questions/7703196/sqlite-increment-unique-integer-field
+
+        const {
+          _max: { order: maxOrder },
+        } = await prisma.item.aggregate({
+          where: { listId, list: { userId } },
+          _max: { order: true },
+        });
+
+        const diff = (maxOrder as number) - Math.min(...downs);
+
+        await tx.item.updateMany({
+          where: { order: { in: downs }, listId, list: { userId } },
+          data: { order: { increment: diff + 1 } },
+        });
+
+        const newDowns = downs.map((order) => order + diff + 1);
+
+        await tx.item.updateMany({
+          where: {
+            order: { in: newDowns },
+            listId,
+            list: { userId },
+          },
+          data: { order: { decrement: diff + 2 } },
+        });
+      }
+
+      await tx.item.update({
         where: {
-          order: { in: newDowns },
-          listId: parseInt(id),
+          order_listId: { order: -1, listId },
           list: { userId },
         },
-        data: { order: { decrement: diff + 2 } },
+        data: { order: to },
       });
-    }
-
-    await tx.item.update({
-      where: {
-        order_listId: { order: -1, listId: parseInt(id) },
-        list: { userId },
-      },
-      data: { order: to },
-    });
-  });
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+  );
 
   const items = await findOrderedItems(userId);
   return NextResponse.json(items);

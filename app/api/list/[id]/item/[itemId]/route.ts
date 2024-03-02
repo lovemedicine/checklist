@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma";
 import { getUserId } from "@/util/auth";
+import { updateListItemOrdersInTransaction } from "@/util/db";
 
 type Params = {
   id: string;
@@ -19,7 +20,7 @@ export async function PUT(
       list: { id: parseInt(id), userId },
     },
     data: {
-      checked: data.value,
+      checked: data.checked,
     },
   });
   return NextResponse.json(result);
@@ -29,12 +30,41 @@ export async function DELETE(
   request: Request,
   { params: { id, itemId } }: { params: Params }
 ) {
+  const listId = parseInt(id);
   const userId = await getUserId();
-  const result = await prisma.item.delete({
+  const identifyingCondition = {
     where: {
       id: parseInt(itemId),
-      list: { id: parseInt(id), userId },
+      list: { id: listId, userId },
     },
+  };
+  const item = await prisma.item.findUnique(identifyingCondition);
+
+  if (!item) {
+    return NextResponse.error();
+  }
+
+  const itemsToIncrement = await prisma.item.findMany({
+    where: { list: { id: listId, userId }, order: { gt: item.order } },
+    select: { order: true },
   });
-  return NextResponse.json(result);
+
+  const orders = itemsToIncrement.map((item) => item.order);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.item.delete(identifyingCondition);
+    await updateListItemOrdersInTransaction(
+      tx,
+      listId,
+      userId,
+      orders,
+      "decrement"
+    );
+  });
+
+  const items = await prisma.item.findMany({
+    where: { list: { id: listId, userId } },
+  });
+
+  return NextResponse.json(items);
 }
